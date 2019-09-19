@@ -1,0 +1,17 @@
+{
+  "name": "algolia_ingest",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "@google-cloud/firestore": "^2.3.0",
+    "algoliasearch": "^3.34.0",
+    "dotenv": "^8.1.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jamie Condliffe",
+  "license": "ISC"
+}
