@@ -1,3 +1,4 @@
+import os
 from flask import Flask, render_template, request
 from google.cloud import firestore
 from algoliasearch.search_client import SearchClient
@@ -27,7 +28,12 @@ def search():
         'query': query,
     }
 
-    client = SearchClient.create('9JZ8KBSETQ', 'ad297cac926002b5dc094ef1be2ec656')
+    # app.yaml env vars are not available for local testing yet, see
+    # https://stackoverflow.com/questions/52999747/python-3-7-local-development-server-options-for-new-app-engine-apps
+    # algolia_app_id = os.environ['algolia_app_id']
+    # algolia_ro_api_key = os.environ['algolia_ro_api_key']
+
+    client = SearchClient.create('9JZ8KBSETQ', '62beeb4c091e9e6d907d1556fd1eb4f9')
     index = client.init_index('dev_titles')
     results = index.search(query)
     print(results)
