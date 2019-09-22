@@ -2,11 +2,44 @@ import React from 'react';
 import './App.css';
 
 class App extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      currentTitle: null,
+    }
+
+    this.titleClick = this.titleClick.bind(this);
+  }
+
+  titleClick(titleId) {
+    fetch('/title/' + titleId)
+      .then((response) => {
+        return response.json();
+      })
+      .then((json) => {
+        this.setState({
+          currentTitle: json.title
+        });
+      });
+  }
+
   render() {
+    let content;
+
+    if (this.state.currentTitle) {
+      content = (
+        <Title title={this.state.currentTitle} />
+      )
+    } else {
+      content = (
+        <TitleSearchWidget onTitleClick={this.titleClick} />
+      )
+    }
     return (
       <div className="App" >
         <HeaderBar />
-        <TitleSearchWidget />
+        {content}
       </div>
     );
   }
@@ -27,7 +60,7 @@ class Title extends React.Component {
 
   render() {
     return (
-      <h3>{this.props.title}</h3>
+      <h3>{this.props.title.originalTitle}</h3>
     )
   }
 }
@@ -90,7 +123,7 @@ class TitleSearchWidget extends React.Component {
     return (
       <div>
         <SearchBar query={this.state.query} onChange={this.onQueryChange} />
-        <SearchResultsList results={this.state.search.results.hits} />
+        <SearchResultsList results={this.state.search.results.hits} onTitleClick={this.props.onTitleClick} />
       </div>
     );
   }
@@ -129,7 +162,9 @@ class SearchResultsList extends React.Component {
       return (
         <SearchResult
           key={result.tconst}
+          titleId={result.tconst}
           titleName={result.originalTitle}
+          onTitleClick={this.props.onTitleClick}
         />
       );
     });
@@ -141,9 +176,22 @@ class SearchResultsList extends React.Component {
 }
 
 class SearchResult extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleButtonClick = this.handleButtonClick.bind(this);
+  }
+
+  handleButtonClick(event) {
+    this.props.onTitleClick(this.props.titleId);
+  }
+
   render() {
     return (
-      <li><button>{this.props.titleName}</button></li>
+      <li>
+        <button onClick={this.handleButtonClick}>
+          {this.props.titleName}
+        </button>
+      </li>
     );
   }
 }
