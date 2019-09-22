@@ -64,3 +64,6 @@ $RECYCLE.BIN/
 
 # Virtualenv
 env
+
+# Contains React files intended for deployment
+frontend
