@@ -7,10 +7,13 @@ class App extends React.Component {
 
     this.state = {
       currentTitle: null,
+      search: null,
+      searchQuery: null,
     }
 
     this.titleClick = this.titleClick.bind(this);
     this.handleBackToResults = this.handleBackToResults.bind(this);
+    this.handleQueryChange = this.handleQueryChange.bind(this);
   }
 
   titleClick(titleId) {
@@ -31,6 +34,28 @@ class App extends React.Component {
     })
   }
 
+  handleQueryChange(query) {
+    this.setState({
+      searchQuery: query,
+    });
+
+    if (query) {
+      fetch('/search?q=' + query)
+        .then((response) => {
+          return response.json();
+        })
+        .then((json) => {
+          this.setState({
+            search: json,
+          });
+        })
+    } else {
+      this.setState({
+        search: null,
+      })
+    }
+  }
+
   render() {
     let content;
 
@@ -44,7 +69,7 @@ class App extends React.Component {
       )
     } else {
       content = (
-        <TitleSearchWidget onTitleClick={this.titleClick} />
+        <TitleSearchWidget searchQuery={this.state.searchQuery} search={this.state.search} onTitleClick={this.titleClick} onQueryChange={this.handleQueryChange} />
       )
     }
     return (
@@ -77,49 +102,12 @@ class TitleInfo extends React.Component {
 }
 
 class TitleSearchWidget extends React.Component {
-  constructor(props) {
-    super(props)
-
-    // Find a way to set this for empty results and initially
-    this.state = {
-      search: null,
-    }
-
-    this.onQueryChange = this.onQueryChange.bind(this);
-  }
-
-  runSearch(query) {
-    fetch('/search?q=' + query)
-      .then((response) => {
-        return response.json();
-      })
-      .then((json) => {
-        this.setState({
-          search: json,
-        });
-      })
-  }
-
-  onQueryChange(query) {
-    this.setState({
-      query: query
-    })
-
-    if (query) {
-      this.runSearch(query);
-    } else {
-      this.setState({
-        search: null,
-      })
-    }
-  }
-
   render() {
     return (
       <div>
-        <SearchBar query={this.state.query} onChange={this.onQueryChange} />
-        {this.state.search &&
-          <SearchResultsList results={this.state.search.results.hits} onTitleClick={this.props.onTitleClick} />
+        <SearchBar query={this.props.searchQuery} onChange={this.props.onQueryChange} />
+        {this.props.search &&
+          <SearchResultsList results={this.props.search.results.hits} onTitleClick={this.props.onTitleClick} />
         }
       </div>
     );
