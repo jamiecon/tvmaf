@@ -1,7 +1,6 @@
-cd .\web_frontend
-npm run build
-cd ..
-mv .\web_frontend\build .\web_api\frontend
-cd .\web_api 
-gcloud config set project spry-bus-252723
-gcloud app deploy
+New-Item -ItemType directory "deployment"
+Copy-Item ".\web_api\*" ".\deployment\" # currently only copies top level items
+npm run --prefix .\web_frontend\ build
+Move-Item .\web_frontend\build .\deployment\frontend
+gcloud app deploy deployment/app.yaml --project=spry-bus-252723
+Remove-Item -LiteralPath ".\deployment" -Force -Recurse
