@@ -7,24 +7,10 @@ app = Flask(__name__)
 
 db = firestore.Client()
 
-
-@app.route('/', methods=['GET'])
-def index():
-    """Home page"""
-    home_data = {
-        'titles': [],
-    }
-
-    titles = db.collection('title.basics').stream()
-    for title in titles:
-        home_data['titles'].append(title.to_dict())
-    return render_template('index.jinja', **home_data)
-
-
 @app.route('/search', methods=['GET'])
 def search():
     query = request.args.get('q', '')
-    page_data = {
+    result_data = {
         'query': query,
     }
 
@@ -36,25 +22,24 @@ def search():
     client = SearchClient.create('9JZ8KBSETQ', '62beeb4c091e9e6d907d1556fd1eb4f9')
     index = client.init_index('dev_titles')
     results = index.search(query)
-    print(results)
-    page_data['results'] = results
+    result_data['results'] = results
 
-    return jsonify(page_data)
+    return jsonify(result_data)
 
 
-@app.route('/movie/<title_id>')
+@app.route('/title/<title_id>')
 def title(title_id):
-    page_data = {}
+    result_data = {}
 
     titles = db.collection('title.basics').where(
         'tconst', '==', title_id).limit(1).stream()
     for title in titles:
-        page_data['title'] = title.to_dict()
+        result_data['title'] = title.to_dict()
         break
     else:
-        return render_template('404.jinja')
+        return '404'
 
-    return render_template('title.jinja', **page_data)
+    return jsonify(result_data)
 
 
 if __name__ == '__main__':
