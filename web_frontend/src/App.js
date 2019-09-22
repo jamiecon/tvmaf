@@ -82,27 +82,10 @@ class TitleSearchWidget extends React.Component {
 
     // Find a way to set this for empty results and initially
     this.state = {
-      search: {
-        results: {
-          hits: [],
-        }
-      },
-      query: ''
+      search: null,
     }
 
     this.onQueryChange = this.onQueryChange.bind(this);
-    this.setEmptyResults = this.setEmptyResults.bind(this);
-  }
-
-  setEmptyResults() {
-    this.setState({
-      search: {
-        results: {
-          hits: [],
-        }
-      },
-      query: ''
-    });
   }
 
   runSearch(query) {
@@ -125,8 +108,9 @@ class TitleSearchWidget extends React.Component {
     if (query) {
       this.runSearch(query);
     } else {
-      console.log("setting empty");
-      this.setEmptyResults();
+      this.setState({
+        search: null,
+      })
     }
   }
 
@@ -134,7 +118,9 @@ class TitleSearchWidget extends React.Component {
     return (
       <div>
         <SearchBar query={this.state.query} onChange={this.onQueryChange} />
-        <SearchResultsList results={this.state.search.results.hits} onTitleClick={this.props.onTitleClick} />
+        {this.state.search &&
+          <SearchResultsList results={this.state.search.results.hits} onTitleClick={this.props.onTitleClick} />
+        }
       </div>
     );
   }
