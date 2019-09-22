@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 from google.cloud import firestore
 from algoliasearch.search_client import SearchClient
 
@@ -39,7 +39,7 @@ def search():
     print(results)
     page_data['results'] = results
 
-    return render_template('search.jinja', **page_data)
+    return jsonify(page_data)
 
 
 @app.route('/movie/<title_id>')
