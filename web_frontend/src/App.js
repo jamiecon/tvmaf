@@ -10,6 +10,7 @@ class App extends React.Component {
     }
 
     this.titleClick = this.titleClick.bind(this);
+    this.handleBackToResults = this.handleBackToResults.bind(this);
   }
 
   titleClick(titleId) {
@@ -24,12 +25,22 @@ class App extends React.Component {
       });
   }
 
+  handleBackToResults(event) {
+    this.setState({
+      currentTitle: null,
+    })
+  }
+
   render() {
     let content;
 
     if (this.state.currentTitle) {
       content = (
-        <Title title={this.state.currentTitle} />
+        <div>
+          <button onClick={this.handleBackToResults}>Back to results</button>
+          <TitleInfo title={this.state.currentTitle} />
+        </div>
+
       )
     } else {
       content = (
@@ -53,7 +64,7 @@ class HeaderBar extends React.PureComponent {
   }
 }
 
-class Title extends React.Component {
+class TitleInfo extends React.Component {
   constructor(props) {
     super(props);
   }
