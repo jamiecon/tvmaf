@@ -9,15 +9,52 @@ BASE_URL = 'https://datasets.imdbws.com/'
 TSV_GZ_EXTENSION = '.tsv.gz'
 TSV_EXTENSION = '.tsv'
 
-# Each record is a tuple of (file name, primary key field)
+def ingest_titles(utf8_tsv):
+    TARGET_COLLECTION = 'imdb_title'
+    TARGET_PRIMARY_KEY_FIELD = 'tconst'
+    SOURCE_PRIMARY_KEY_FIELD = 'tconst'
+
+    tsv_reader = csv.DictReader(utf8_tsv, delimiter='\t', quoting=csv.QUOTE_NONE)
+    db = firestore.Client()
+    rowcount = 0
+    for row in tsv_reader:
+        if row['titleType'] != 'movie' or row['isAdult'] == '1':
+            continue
+
+        year = row['startYear']
+        try:
+            year = int(year)
+            if year < 1980:
+                print('Skipped movie from {0}'.format(year))
+                continue
+        except:
+            print('Skipped movie with invalid year: {0}'.format(year))
+            continue
+
+        rowcount = rowcount + 1
+        exists = False
+        documents = db.collection(TARGET_COLLECTION).where(TARGET_PRIMARY_KEY_FIELD, '==', row[SOURCE_PRIMARY_KEY_FIELD]).stream()
+        for _ in documents:
+            print('Record with ID {0} was already present.'.format(row[SOURCE_PRIMARY_KEY_FIELD]))
+            exists = True
+            break
+
+        if not exists:
+            db.collection(TARGET_COLLECTION).add(dict(row))
+            print('Inserted new record with ID: {0}'.format(row[SOURCE_PRIMARY_KEY_FIELD]))
+
+        if rowcount > 500:
+            break
+
+# Each record is a tuple of (file name, method for processing)
 IMDB_DATA_FILES = [
-    ('name.basics', 'nconst'),
+    # ('name.basics', None),
     # ('title.akas', None),
-    # ('title.basics', 'tconst'),
+    ('title.basics', ingest_titles),
     # ('title.crew', None),
     # ('title.episode', None),
-    ('title.principals', None),
-    # ('title.ratings', 'tconst')
+    # ('title.principals', None),
+    # ('title.ratings', None)
     ]
 
 def ingest(data_dir='tmp/', delete_temp_files=True):
@@ -40,32 +77,10 @@ def ingest(data_dir='tmp/', delete_temp_files=True):
 
         with gzip.open(tsv_gz_filename, 'rb') as extracted_data:
             wrapper = TextIOWrapper(extracted_data, encoding='utf-8')
-            tsv_reader = csv.DictReader(wrapper, delimiter='\t', quoting=csv.QUOTE_NONE)
+            imdb_data_file[1](wrapper)
 
-            db = firestore.Client()
-            rowcount = 0
+        print('Finished executing')
 
-            for row in tsv_reader:
-                if 'titleType' in row and row['titleType'] != 'movie':
-                    continue
-
-                rowcount = rowcount + 1
-
-                exists = False
-                # Only check for existence if we have a key to check with
-                if imdb_data_file[1]:
-                    documents = db.collection(imdb_data_file[0]).where(imdb_data_file[1], '==', row[imdb_data_file[1]]).select({imdb_data_file[1]}).stream()
-                    for _ in documents:
-                        print('Record with ID {0} was already present.'.format(row[imdb_data_file[1]]))
-                        exists = True
-                        break
-
-                if not exists:
-                    db.collection(imdb_data_file[0]).document().set(dict(row))
-                    print('Inserted new record: {0}'.format(row))
-
-                if rowcount > 20:
-                    break
 
     return 'Success'
 

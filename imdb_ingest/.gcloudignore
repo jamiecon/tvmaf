@@ -1,5 +1,6 @@
 test.py
 tmp/
 env/
+__pycache__/
 .vscode
 deploy.ps1
