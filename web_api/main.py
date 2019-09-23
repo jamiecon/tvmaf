@@ -31,12 +31,12 @@ def search():
 def title(title_id):
     result_data = {}
 
-    titles = db.collection('title.basics').where(
-        'tconst', '==', title_id).limit(1).stream()
-    for title in titles:
+    title_ref = db.collection(u'title').document(title_id)
+
+    try:
+        title = title_ref.get()
         result_data['title'] = title.to_dict()
-        break
-    else:
+    except google.cloud.exceptions.NotFound:
         return '404'
 
     return jsonify(result_data)
