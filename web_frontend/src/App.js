@@ -8,7 +8,7 @@ class App extends React.Component {
     this.state = {
       currentTitle: null,
       search: null,
-      searchQuery: null,
+      searchQuery: "",
     }
 
     this.titleClick = this.titleClick.bind(this);
@@ -22,7 +22,8 @@ class App extends React.Component {
         return response.json();
       })
       .then((json) => {
-        this.setState({
+        console.log(json.title);
+        this.setState({          
           currentTitle: json.title
         });
       });
@@ -69,7 +70,12 @@ class App extends React.Component {
       )
     } else {
       content = (
-        <TitleSearchWidget searchQuery={this.state.searchQuery} search={this.state.search} onTitleClick={this.titleClick} onQueryChange={this.handleQueryChange} />
+        <TitleSearchWidget 
+          searchQuery={this.state.searchQuery}
+          search={this.state.search}
+          onTitleClick={this.titleClick}
+          onQueryChange={this.handleQueryChange}
+        />
       )
     }
     return (
@@ -90,13 +96,9 @@ class HeaderBar extends React.PureComponent {
 }
 
 class TitleInfo extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-
   render() {
     return (
-      <h3>{this.props.title.originalTitle}</h3>
+      <h3>{this.props.title.display_title}</h3>
     )
   }
 }
@@ -107,7 +109,10 @@ class TitleSearchWidget extends React.Component {
       <div>
         <SearchBar query={this.props.searchQuery} onChange={this.props.onQueryChange} />
         {this.props.search &&
-          <SearchResultsList results={this.props.search.results.hits} onTitleClick={this.props.onTitleClick} />
+          <SearchResultsList
+            results={this.props.search.results.hits}
+            onTitleClick={this.props.onTitleClick}
+          />
         }
       </div>
     );
@@ -146,9 +151,9 @@ class SearchResultsList extends React.Component {
     const results = this.props.results.map((result) => {
       return (
         <SearchResult
-          key={result.tconst}
-          titleId={result.tconst}
-          titleName={result.originalTitle}
+          key={result.objectID}
+          titleId={result.objectID}
+          titleName={result.displayTitle}
           onTitleClick={this.props.onTitleClick}
         />
       );
