@@ -8,6 +8,7 @@ from io import TextIOWrapper
 titles = [
     {
         'display_title': 'Goodfellas',
+        'year': '1990',
         'imdb_id': 'tt0099685',
         'netflix_id': '70002022',
         'meals': [
@@ -27,6 +28,7 @@ titles = [
     },
     {
         'display_title': 'The Grand Budapest Hotel',
+        'year': '2014',
         'imdb_id': 'tt2278388',
         'netflix_id': '70295915',
         'meals': [
