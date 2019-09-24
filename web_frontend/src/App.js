@@ -9,6 +9,7 @@ class App extends React.Component {
       currentTitle: null,
       search: null,
       searchQuery: "",
+      loading: false,
     }
 
     this.titleClick = this.titleClick.bind(this);
@@ -17,6 +18,10 @@ class App extends React.Component {
   }
 
   titleClick(titleId) {
+    this.setState({
+      loading: true
+    });
+
     fetch('/title/' + titleId)
       .then((response) => {
         return response.json();
@@ -24,7 +29,8 @@ class App extends React.Component {
       .then((json) => {
         console.log(json.title);
         this.setState({
-          currentTitle: json.title
+          currentTitle: json.title,
+          loading: false,
         });
       });
   }
@@ -38,6 +44,7 @@ class App extends React.Component {
   handleQueryChange(query) {
     this.setState({
       searchQuery: query,
+      loading: true,
     });
 
     if (query) {
@@ -48,6 +55,7 @@ class App extends React.Component {
         .then((json) => {
           this.setState({
             search: json,
+            loading: false,
           });
         })
     } else {
@@ -60,7 +68,9 @@ class App extends React.Component {
   render() {
     let content;
 
-    if (this.state.currentTitle) {
+    if (this.state.loading) {
+      content = <LoadingIndicator />
+    } else if (this.state.currentTitle) {
       content = (
         <div>
           <button onClick={this.handleBackToResults}>Back to results</button>
@@ -225,6 +235,16 @@ class SearchResult extends React.Component {
       </li>
     );
   }
+}
+
+function LoadingIndicator(props) {
+  return (
+    <div class="lds-ellipsis">
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>)
 }
 
 export default App;
