@@ -91,18 +91,51 @@ class App extends React.Component {
     return (
       <div className="App" >
         <HeaderBar />
+        <main role="main">
+          <div class="jumbotron">
+            <div class="container">
+              <h1 class="display-3">tv, movies and food!</h1>
+              <p>Yes, this incredibly useful web site does exactly what it says on the tin. A comprehensive database
+            of food served in your favourite TV shows and movies.</p>
+              <form>
+                <input type="text" class="form-control" placeholder="Search for TV shows, movies or foods" aria-label="Search"></input>
+              </form>
+            </div>
+          </div>
+        </main>
         {content}
       </div>
     );
   }
 }
 
-class HeaderBar extends React.PureComponent {
-  render() {
-    return (
-      <h1>tvmaf</h1>
-    );
-  }
+function HeaderBar(props) {
+  return (
+    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+      <a class="navbar-brand" href="/">tvmaf</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault"
+        aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">About</a>
+          </li>
+        </ul>
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/jamiecon/tvmaf/">GitHub</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+  )
 }
 
 class TitleInfo extends React.Component {
