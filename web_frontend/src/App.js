@@ -103,7 +103,7 @@ class TitleInfo extends React.Component {
         <h3>
           {title.display_title} ({title.year})
         </h3>
-        {title.meals.length > 0 &&
+        {title.meals && title.meals.length > 0 &&
           <h4>Meals</h4>
         }
       </div>
