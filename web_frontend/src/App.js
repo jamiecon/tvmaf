@@ -45,6 +45,7 @@ class App extends React.Component {
     this.setState({
       searchQuery: query,
       loading: true,
+      currentTitle: null,
     });
 
     if (query) {
@@ -61,6 +62,7 @@ class App extends React.Component {
     } else {
       this.setState({
         search: null,
+        loading: false,
       })
     }
   }
@@ -78,13 +80,11 @@ class App extends React.Component {
         </div>
 
       )
-    } else {
+    } else if (this.state.search) {
       content = (
-        <SearchResults
-          searchQuery={this.state.searchQuery}
-          search={this.state.search}
+        <SearchResultsList
+          results={this.state.search.results.hits}
           onTitleClick={this.titleClick}
-          onQueryChange={this.handleQueryChange}
         />
       )
     }
@@ -103,8 +103,16 @@ class App extends React.Component {
               />
             </div>
           </div>
+
+          <div class="container">
+            <div class="row">
+              <div class="col">
+                {content}
+              </div>
+            </div>
+          </div>
         </main>
-        {content}
+
       </div>
     );
   }
@@ -185,21 +193,6 @@ class MealInfo extends React.Component {
   }
 }
 
-class SearchResults extends React.Component {
-  render() {
-    return (
-      <div>
-        {this.props.search &&
-          <SearchResultsList
-            results={this.props.search.results.hits}
-            onTitleClick={this.props.onTitleClick}
-          />
-        }
-      </div>
-    );
-  }
-}
-
 class SearchField extends React.Component {
   constructor(props) {
     super(props)
@@ -243,7 +236,7 @@ class SearchResultsList extends React.Component {
     });
 
     return (
-      <ul>{results}</ul>
+      <ul class="list-group search-results">{results}</ul>
     );
   }
 }
@@ -260,8 +253,8 @@ class SearchResult extends React.Component {
 
   render() {
     return (
-      <li>
-        <button onClick={this.handleButtonClick}>
+      <li class="list-group-item">
+        <button class="btn btn-link" onClick={this.handleButtonClick}>
           {this.props.titleName}
         </button>
       </li>
@@ -271,12 +264,15 @@ class SearchResult extends React.Component {
 
 function LoadingIndicator(props) {
   return (
-    <div class="lds-ellipsis">
-      <div></div>
-      <div></div>
-      <div></div>
-      <div></div>
-    </div>)
+    <div class="col-sm text-center">
+      <div class="lds-ellipsis">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+      </div>
+    </div>
+  )
 }
 
 export default App;
