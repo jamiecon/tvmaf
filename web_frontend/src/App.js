@@ -23,7 +23,7 @@ class App extends React.Component {
       })
       .then((json) => {
         console.log(json.title);
-        this.setState({          
+        this.setState({
           currentTitle: json.title
         });
       });
@@ -70,7 +70,7 @@ class App extends React.Component {
       )
     } else {
       content = (
-        <TitleSearchWidget 
+        <TitleSearchWidget
           searchQuery={this.state.searchQuery}
           search={this.state.search}
           onTitleClick={this.titleClick}
@@ -99,20 +99,48 @@ class TitleInfo extends React.Component {
   render() {
     const title = this.props.title;
     return (
-      <div>
+      <>
         <h3>
           {title.display_title} ({title.year})
         </h3>
         {title.meals && title.meals.length > 0 &&
-          <h4>Meals</h4>
+          <Meals meals={title.meals} />
         }
-      </div>
+      </>
+    )
+  }
+}
+
+class Meals extends React.Component {
+  render() {
+    const meals = this.props.meals.map((meal) => {
+      return (
+        <MealInfo meal={meal} />
+      );
+    });
+
+    return (
+      <>
+        <h4>Meals</h4>
+        <ul>
+          {meals}
+        </ul>
+      </>
     )
   }
 }
 
 class MealInfo extends React.Component {
+  render() {
+    const meal = this.props.meal;
 
+    return (
+      <li>
+        {meal.meal_name}
+        <a href="https://www.netflix.com/title/">See on Netflix</a>
+      </li>
+    );
+  }
 }
 
 class TitleSearchWidget extends React.Component {
