@@ -80,7 +80,7 @@ class App extends React.Component {
       )
     } else {
       content = (
-        <TitleSearchWidget
+        <SearchResults
           searchQuery={this.state.searchQuery}
           search={this.state.search}
           onTitleClick={this.titleClick}
@@ -97,9 +97,10 @@ class App extends React.Component {
               <h1 class="display-3">tv, movies and food!</h1>
               <p>Yes, this incredibly useful web site does exactly what it says on the tin. A comprehensive database
             of food served in your favourite TV shows and movies.</p>
-              <form>
-                <input type="text" class="form-control" placeholder="Search for TV shows, movies or foods" aria-label="Search"></input>
-              </form>
+              <SearchField
+                query={this.props.searchQuery}
+                onChange={this.handleQueryChange}
+              />
             </div>
           </div>
         </main>
@@ -184,14 +185,10 @@ class MealInfo extends React.Component {
   }
 }
 
-class TitleSearchWidget extends React.Component {
+class SearchResults extends React.Component {
   render() {
     return (
       <div>
-        <SearchBar
-          query={this.props.searchQuery}
-          onChange={this.props.onQueryChange}
-        />
         {this.props.search &&
           <SearchResultsList
             results={this.props.search.results.hits}
@@ -203,7 +200,7 @@ class TitleSearchWidget extends React.Component {
   }
 }
 
-class SearchBar extends React.Component {
+class SearchField extends React.Component {
   constructor(props) {
     super(props)
 
@@ -216,16 +213,18 @@ class SearchBar extends React.Component {
 
   render() {
     return (
-      <div>
-        <label htmlFor="query">Search for title</label>
+      <form>
         <input
           type="text"
+          class="form-control"
+          placeholder="Search for TV shows, movies or foods"
+          aria-label="Search"
           name="query"
           id="query"
           value={this.props.query}
           onChange={this.handleChange}
-        />
-      </div>
+        ></input>
+      </form>
     );
   }
 }
