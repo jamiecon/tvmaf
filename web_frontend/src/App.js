@@ -97,10 +97,22 @@ class HeaderBar extends React.PureComponent {
 
 class TitleInfo extends React.Component {
   render() {
+    const title = this.props.title;
     return (
-      <h3>{this.props.title.display_title}</h3>
+      <div>
+        <h3>
+          {title.display_title} ({title.year})
+        </h3>
+        {title.meals.length > 0 &&
+          <h4>Meals</h4>
+        }
+      </div>
     )
   }
+}
+
+class MealInfo extends React.Component {
+
 }
 
 class TitleSearchWidget extends React.Component {

@@ -40,6 +40,16 @@ titles = [
             },
         ]
     },
+    {
+        'display_title': 'Ad Astra',
+        'year': '2019',
+        'imdb_id': 'tt2935510',
+    },
+    {
+        'display_title': 'The Rock',
+        'year': '1996',
+        'imdb_id': 'tt0117500',
+    },
 ]
 
 meals = [
