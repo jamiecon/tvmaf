@@ -113,17 +113,15 @@ class TitleInfo extends React.Component {
 
 class Meals extends React.Component {
   render() {
-    const meals = this.props.meals.map((meal) => {
-      return (
-        <MealInfo meal={meal} />
-      );
-    });
-
     return (
       <>
         <h4>Meals</h4>
         <ul>
-          {meals}
+          {
+            this.props.meals.map(meal => (
+              <MealInfo meal={meal} />
+            ))
+          }
         </ul>
       </>
     )
@@ -147,7 +145,10 @@ class TitleSearchWidget extends React.Component {
   render() {
     return (
       <div>
-        <SearchBar query={this.props.searchQuery} onChange={this.props.onQueryChange} />
+        <SearchBar
+          query={this.props.searchQuery}
+          onChange={this.props.onQueryChange}
+        />
         {this.props.search &&
           <SearchResultsList
             results={this.props.search.results.hits}
