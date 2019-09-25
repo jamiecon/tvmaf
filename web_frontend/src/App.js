@@ -4,13 +4,74 @@ import './App.css';
 class App extends React.Component {
   constructor(props) {
     super(props);
-
     this.state = {
-      currentTitle: null,
-      search: null,
-      searchQuery: "",
-      loading: false,
+      page: 'home'
     }
+    this.navigateHome = this.navigateHome.bind(this);
+    this.navigateAbout = this.navigateAbout.bind(this);
+  }
+
+  navigateHome(event) {
+    this.setState({
+      page: 'home'
+    });
+    event.preventDefault();
+  }
+
+  navigateAbout(event) {
+    this.setState({
+      page: 'about'
+    })
+    event.preventDefault();
+  }
+
+  render() {
+    let page
+    if (this.state.page === 'home') {
+      page = <Home />
+    } else if (this.state.page === 'about') {
+      page = <About />
+    }
+
+    return (
+      <div className="App" >
+        <HeaderBar
+          navigateHome={this.navigateHome}
+          navigateAbout={this.navigateAbout}
+        />
+        <main role="main">
+          {page}
+        </main>
+      </div>
+    );
+  }
+}
+
+function About(props) {
+  return (
+    <div class="container">
+      <div class="row">
+        <div class="col">
+          <p>about</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+class Home extends React.Component {
+  baseState = {
+    page: 'home',
+    currentTitle: null,
+    search: null,
+    searchQuery: "",
+    loading: false,
+  }
+
+  constructor(props) {
+    super(props);
+
+    this.state = this.baseState
 
     this.titleClick = this.titleClick.bind(this);
     this.handleBackToResults = this.handleBackToResults.bind(this);
@@ -27,7 +88,6 @@ class App extends React.Component {
         return response.json();
       })
       .then((json) => {
-        console.log(json.title);
         this.setState({
           currentTitle: json.title,
           loading: false,
@@ -72,12 +132,16 @@ class App extends React.Component {
 
     if (this.state.loading) {
       content = <LoadingIndicator />
+    } else if (this.state.page === 'about') {
+      content = (
+        <div>about</div>
+      )
     } else if (this.state.currentTitle) {
       content = (
-        <div>
-          <button onClick={this.handleBackToResults}>Back to results</button>
+        <>
+          <button class="btn" onClick={this.handleBackToResults}>Back to results</button>
           <TitleInfo title={this.state.currentTitle} />
-        </div>
+        </>
 
       )
     } else if (this.state.search) {
@@ -89,31 +153,27 @@ class App extends React.Component {
       )
     }
     return (
-      <div className="App" >
-        <HeaderBar />
-        <main role="main">
-          <div class="jumbotron">
-            <div class="container">
-              <h1 class="display-3">tv, movies and food!</h1>
-              <p>Yes, this incredibly useful web site does exactly what it says on the tin. A comprehensive database
-            of food served in your favourite TV shows and movies.</p>
-              <SearchField
-                query={this.props.searchQuery}
-                onChange={this.handleQueryChange}
-              />
-            </div>
-          </div>
-
+      <>
+        <div class="jumbotron">
           <div class="container">
-            <div class="row">
-              <div class="col">
-                {content}
-              </div>
+            <h1 class="display-3">tv, movies and food!</h1>
+            <p>Yes, this incredibly useful web site does exactly what it says on the tin. A comprehensive database
+        of food served in your favourite TV shows and movies.</p>
+            <SearchField
+              query={this.props.searchQuery}
+              onChange={this.handleQueryChange}
+            />
+          </div>
+        </div>
+
+        <div class="container">
+          <div class="row">
+            <div class="col">
+              {content}
             </div>
           </div>
-        </main>
-
-      </div>
+        </div>
+      </>
     );
   }
 }
@@ -129,11 +189,23 @@ function HeaderBar(props) {
 
       <div class="collapse navbar-collapse" id="navbarsExampleDefault">
         <ul class="navbar-nav mr-auto">
-          <li class="nav-item active">
-            <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+          <li class="nav-item">
+            <a
+              onClick={props.navigateHome}
+              class="nav-link"
+              href="#"
+            >
+              Home
+            </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">About</a>
+            <a
+              onClick={props.navigateAbout}
+              class="nav-link"
+              href="#"
+            >
+              About
+            </a>
           </li>
         </ul>
         <ul class="navbar-nav">
@@ -143,7 +215,6 @@ function HeaderBar(props) {
         </ul>
       </div>
     </nav>
-
   )
 }
 
