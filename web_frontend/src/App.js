@@ -52,7 +52,24 @@ function About(props) {
     <div class="container">
       <div class="row">
         <div class="col">
-          <p>about</p>
+          <h1>About</h1>
+          <p>Test application using the following services and technologies:</p>
+          <dl>
+            <dt>Front end</dt>
+            <dd>React</dd>
+
+            <dt>Back end</dt>
+            <dd>Google App Engine, Flask</dd>
+
+            <dt>Persistence</dt>
+            <dd>Firestore</dd>
+
+            <dt>Search</dt>
+            <dd>Algolia</dd>
+
+            <dt>Plumbing</dt>
+            <dd>Google Cloud Functions</dd>
+          </dl>
         </div>
       </div>
     </div>
@@ -154,7 +171,7 @@ class Home extends React.Component {
     }
     return (
       <>
-        <div class="jumbotron">
+        <div class="jumbotron pt-0">
           <div class="container">
             <h1 class="display-3">tv, movies and food!</h1>
             <p>Yes, this incredibly useful web site does exactly what it says on the tin. A comprehensive database
@@ -180,7 +197,7 @@ class Home extends React.Component {
 
 function HeaderBar(props) {
   return (
-    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <nav class="navbar navbar-expand-md navbar-dark static-top bg-dark">
       <a class="navbar-brand" href="/">tvmaf</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault"
         aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
