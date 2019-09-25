@@ -1,3 +1,4 @@
+import datetime
 import requests
 import gzip
 import csv
@@ -16,22 +17,24 @@ def ingest_titles(utf8_tsv):
 
     tsv_reader = csv.DictReader(utf8_tsv, delimiter='\t', quoting=csv.QUOTE_NONE)
     db = firestore.Client()
+
     rowcount = 0
     for row in tsv_reader:
         if row['titleType'] != 'movie' or row['isAdult'] == '1':
             continue
 
-        year = row['startYear']
         try:
-            year = int(year)
+            year = int(row['startYear'])
             if year < 1980:
-                print('Skipped movie from {0}'.format(year))
                 continue
         except:
-            print('Skipped movie with invalid year: {0}'.format(year))
             continue
+        
+        rowcount += 1
 
-        rowcount = rowcount + 1
+        new_document = dict(row)
+        new_document['imported_at'] = datetime.datetime.now()
+
         exists = False
         documents = db.collection(TARGET_COLLECTION).where(TARGET_PRIMARY_KEY_FIELD, '==', row[SOURCE_PRIMARY_KEY_FIELD]).stream()
         for _ in documents:
@@ -40,11 +43,10 @@ def ingest_titles(utf8_tsv):
             break
 
         if not exists:
-            db.collection(TARGET_COLLECTION).add(dict(row))
-            print('Inserted new record with ID: {0}'.format(row[SOURCE_PRIMARY_KEY_FIELD]))
+            db.collection(TARGET_COLLECTION).add(new_document)
+            print('Inserted new record with ID: {0} and data {1}'.format(row[SOURCE_PRIMARY_KEY_FIELD], new_document))
 
-        if rowcount > 500:
-            break
+    print('Processed {0} rows.'.format(rowcount))
 
 # Each record is a tuple of (file name, method for processing)
 IMDB_DATA_FILES = [
