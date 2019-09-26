@@ -34,7 +34,7 @@ class App extends React.Component {
     }
 
     return (
-      <div className="App" >
+      <div>
         <HeaderBar
           navigateHome={this.navigateHome}
           navigateAbout={this.navigateAbout}
@@ -45,6 +45,46 @@ class App extends React.Component {
       </div>
     );
   }
+}
+
+function HeaderBar(props) {
+  return (
+    <nav class="navbar navbar-expand-md navbar-dark static-top bg-dark">
+      <a class="navbar-brand" href="/">tvmaf</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault"
+        aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item">
+            <a
+              onClick={props.navigateHome}
+              class="nav-link"
+              href="#"
+            >
+              Home
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              onClick={props.navigateAbout}
+              class="nav-link"
+              href="#"
+            >
+              About
+            </a>
+          </li>
+        </ul>
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/jamiecon/tvmaf/">GitHub</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  )
 }
 
 function About(props) {
@@ -149,10 +189,6 @@ class Home extends React.Component {
 
     if (this.state.loading) {
       content = <LoadingIndicator />
-    } else if (this.state.page === 'about') {
-      content = (
-        <div>about</div>
-      )
     } else if (this.state.currentTitle) {
       content = (
         <>
@@ -193,46 +229,6 @@ class Home extends React.Component {
       </>
     );
   }
-}
-
-function HeaderBar(props) {
-  return (
-    <nav class="navbar navbar-expand-md navbar-dark static-top bg-dark">
-      <a class="navbar-brand" href="/">tvmaf</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault"
-        aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-
-      <div class="collapse navbar-collapse" id="navbarsExampleDefault">
-        <ul class="navbar-nav mr-auto">
-          <li class="nav-item">
-            <a
-              onClick={props.navigateHome}
-              class="nav-link"
-              href="#"
-            >
-              Home
-            </a>
-          </li>
-          <li class="nav-item">
-            <a
-              onClick={props.navigateAbout}
-              class="nav-link"
-              href="#"
-            >
-              About
-            </a>
-          </li>
-        </ul>
-        <ul class="navbar-nav">
-          <li class="nav-item">
-            <a class="nav-link" href="https://github.com/jamiecon/tvmaf/">GitHub</a>
-          </li>
-        </ul>
-      </div>
-    </nav>
-  )
 }
 
 class TitleInfo extends React.Component {
@@ -286,25 +282,40 @@ class SearchField extends React.Component {
     super(props)
 
     this.handleChange = this.handleChange.bind(this);
+    this.handleClear = this.handleClear.bind(this);
   }
 
   handleChange(event) {
     this.props.onChange(event.target.value);
   }
 
+  handleClear() {
+    console.log('clearing');
+    this.props.onChange('');
+  }
+
   render() {
     return (
       <form>
-        <input
-          type="text"
-          class="form-control"
-          placeholder="Search for TV shows, movies or foods"
-          aria-label="Search"
-          name="query"
-          id="query"
-          value={this.props.query}
-          onChange={this.handleChange}
-        ></input>
+        <div class="row">
+          <div class="col">
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Search for TV shows, movies or foods"
+              aria-label="Search"
+              name="query"
+              id="query"
+              value={this.props.query}
+              onChange={this.handleChange}
+            ></input>
+          </div>
+          <div class="col-1">
+            <button class="btn" onClick={this.handleClear}>
+                Clear
+            </button>
+          </div>
+        </div>
       </form>
     );
   }
@@ -352,12 +363,14 @@ class SearchResult extends React.Component {
 
 function LoadingIndicator(props) {
   return (
-    <div class="col-sm text-center">
-      <div class="lds-ellipsis">
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
+    <div class="row">
+      <div class="col-sm text-center">
+        <div class="lds-ellipsis">
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
       </div>
     </div>
   )

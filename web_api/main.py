@@ -31,16 +31,55 @@ def search():
 def title(title_id):
     result_data = {}
 
-    title_ref = db.collection(u'title').document(title_id)
-
-    try:
-        title = title_ref.get()
-        result_data['title'] = title.to_dict()
-    except google.cloud.exceptions.NotFound:
-        return '404'
-
+    title_ref = db.collection('title').document(title_id)
+    title = title_ref.get()
+    if not title.exists:
+        output = {
+            'success': False,
+            'error': 'Title not found',
+        }
+        return jsonify(output), 404
+    result_data['title'] = title.to_dict()
     return jsonify(result_data)
 
+@app.route('/title/<title_id>/meal/add', methods=['POST'])
+def add_meal(title_id):
+    title_ref = db.collection('title').document(title_id)
+    title = title_ref.get()
+    if not title.exists:
+        output = {
+            'success': False,
+            'error': 'Title not found',
+        }
+        return jsonify(output), 400
+
+    meal_name = request.form.get('meal_name')
+    time_seconds = request.form.get('time_seconds')
+    if not meal_name or not time_seconds:
+        output = {
+            'success': False
+        }
+        return jsonify(output), 400
+
+    meal = {
+        'meal_name': meal_name,
+        'time_seconds': time_seconds,
+    }
+    title_dict = title.to_dict()
+    meals = title_dict.get('meals')
+    if(meals):
+        meals.append(meal)
+    else:
+        meals = [meal]   
+
+    title_ref.set({
+        'meals': meals
+    }, merge=True)
+
+    output = {
+        'success': True
+    }
+    return jsonify(output)
 
 if __name__ == '__main__':
     # This is used when running locally only. When deploying to Google App
