@@ -13,16 +13,19 @@ titles = [
         'netflix_id': '70002022',
         'meals': [
             {
-                'meal_id': 'yyy',
                 'meal_name': 'Prison Sauce',
                 'time_seconds': 4234,
-                'babish_youtube_id': 'foo'                
+                'youtube_videos': [
+                    {
+                        'title': 'Binging with Babish - Goodfellas Prison Sauce',
+                        'id': 'uEjMyHccX8U'
+                    }
+                ],
             },
             {
-                'meal_id': 'zzzz',
                 'meal_name': 'Ragu',
                 'time_seconds': 1856,
-                'babish_youtube_id': 'foo'
+                'youtube_videos': [],
             },
         ]
     },
@@ -33,10 +36,14 @@ titles = [
         'netflix_id': '70295915',
         'meals': [
             {
-                'meal_id': 'vvv',
                 'meal_name': 'Courtesan au Chocolat',
                 'time_seconds': 720,
-                'babish_youtube_id': 'foo'
+                'youtube_videos': [
+                    {
+                        'title': 'Binging with Babish - Courtesan au Chocolat',
+                        'id': 'GO5P3fLTwA0'
+                    }
+                ],
             },
         ]
     },
