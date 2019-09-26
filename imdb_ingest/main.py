@@ -32,19 +32,18 @@ def ingest_titles(utf8_tsv):
         
         rowcount += 1
 
-        new_document = dict(row)
-        new_document['imported_at'] = datetime.datetime.now()
+        existing_titles = []
+        imdb_titles_collection = db.collection(TARGET_COLLECTION).select([TARGET_PRIMARY_KEY_FIELD]).stream()
+        for title in imdb_titles_collection:
+            existing_titles.append(title.to_dict()[TARGET_PRIMARY_KEY_FIELD])
 
-        exists = False
-        documents = db.collection(TARGET_COLLECTION).where(TARGET_PRIMARY_KEY_FIELD, '==', row[SOURCE_PRIMARY_KEY_FIELD]).stream()
-        for _ in documents:
-            print('Record with ID {0} was already present.'.format(row[SOURCE_PRIMARY_KEY_FIELD]))
-            exists = True
-            break
-
-        if not exists:
+        if not row['tconst'] in existing_titles:
+            new_document = dict(row)
+            new_document['imported_at'] = datetime.datetime.now()
             db.collection(TARGET_COLLECTION).add(new_document)
             print('Inserted new record with ID: {0} and data {1}'.format(row[SOURCE_PRIMARY_KEY_FIELD], new_document))
+        else:
+            print('Record with ID: {0} already exists'.format(row[SOURCE_PRIMARY_KEY_FIELD]))
 
     print('Processed {0} rows.'.format(rowcount))
 
@@ -66,16 +65,16 @@ def ingest(data_dir='tmp/', delete_temp_files=True):
 
         tsv_gz_filename = data_dir + imdb_data_file[0] + TSV_GZ_EXTENSION
 
-        url = BASE_URL + imdb_data_file[0] + TSV_GZ_EXTENSION
-        try:
-            r = requests.get(url)
-            with open(tsv_gz_filename, mode='wb') as f:
-                f.write(r.content)
-        except:
-            print('Error: Unable to download file')
-            break
+        # url = BASE_URL + imdb_data_file[0] + TSV_GZ_EXTENSION
+        # try:
+        #     r = requests.get(url)
+        #     with open(tsv_gz_filename, mode='wb') as f:
+        #         f.write(r.content)
+        # except:
+        #     print('Error: Unable to download file')
+        #     break
 
-        print('Successfully downloaded from {0}'.format(url))
+        # print('Successfully downloaded from {0}'.format(url))
 
         with gzip.open(tsv_gz_filename, 'rb') as extracted_data:
             wrapper = TextIOWrapper(extracted_data, encoding='utf-8')
