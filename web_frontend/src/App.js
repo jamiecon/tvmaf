@@ -119,7 +119,7 @@ function About(props) {
 class Home extends React.Component {
   baseState = {
     page: 'home',
-    currentTitle: null,
+    currentTitleId: null,
     search: null,
     searchQuery: "",
     loading: false,
@@ -128,7 +128,7 @@ class Home extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = this.baseState
+    this.state = this.baseState;
 
     this.showTitle = this.showTitle.bind(this);
     this.handleBackToResults = this.handleBackToResults.bind(this);
@@ -139,20 +139,8 @@ class Home extends React.Component {
 
   showTitle(titleId) {
     this.setState({
-      loading: true
+      currentTitleId: titleId
     });
-
-    fetch('/title/' + titleId)
-      .then((response) => {
-        return response.json();
-      })
-      .then((json) => {
-        console.log(json);
-        this.setState({
-          currentTitle: json.title,
-          loading: false,
-        });
-      });
   }
 
   handleTitleDisplayTitleChange(event) {
@@ -180,7 +168,7 @@ class Home extends React.Component {
     this.setState({
       searchQuery: query,
       loading: true,
-      currentTitle: null,
+      currentTitleId: null,
     });
 
     if (query) {
@@ -212,13 +200,11 @@ class Home extends React.Component {
 
     if (this.state.loading) {
       content = <LoadingIndicator />
-    } else if (this.state.currentTitle) {
-      console.log('current');
+    } else if (this.state.currentTitleId) {
       content = (
         <TitleInfo
           handleBackToResults={this.handleBackToResults}
-          title={this.state.currentTitle}
-          saveCurrentTitle={this.props.saveCurrentTitle}
+          titleId={this.state.currentTitleId}
         />
       )
     } else if (this.state.search) {
@@ -260,8 +246,20 @@ class TitleInfo extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      editing: false
+      editing: false,
+      loading: true
     }
+
+    fetch('/title/' + this.props.titleId)
+      .then((response) => {
+        return response.json();
+      })
+      .then((json) => {
+        this.setState({
+          title: json.title,
+          loading: false,
+        });
+      });
 
     this.handleEditTitle = this.handleEditTitle.bind(this);
     this.handleSaveTitle = this.handleSaveTitle.bind(this);
@@ -284,13 +282,16 @@ class TitleInfo extends React.Component {
 
   render() {
     let card;
-    if (this.state.editing) {
+    if(this.state.loading) {
+      card = <LoadingIndicator />
+    }
+    else if (this.state.editing) {
       card = <TitleCardEdit
-        title={this.props.title}
+        title={this.state.title}
         handleSaveTitle={this.handleSaveTitle}
       />
     } else {
-      card = <TitleCard title={this.props.title} />
+      card = <TitleCard title={this.state.title} />
     }
 
     return (
