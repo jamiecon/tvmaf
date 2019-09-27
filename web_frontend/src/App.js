@@ -133,6 +133,7 @@ class Home extends React.Component {
     this.titleClick = this.titleClick.bind(this);
     this.handleBackToResults = this.handleBackToResults.bind(this);
     this.handleQueryChange = this.handleQueryChange.bind(this);
+    this.handleClearQuery = this.handleClearQuery.bind(this);
   }
 
   titleClick(titleId) {
@@ -158,7 +159,9 @@ class Home extends React.Component {
     })
   }
 
-  handleQueryChange(query) {
+  handleQueryChange(event) {
+    event.preventDefault();
+    const query = event.target.value
     this.setState({
       searchQuery: query,
       loading: true,
@@ -184,6 +187,11 @@ class Home extends React.Component {
     }
   }
 
+  handleClearQuery(event) {
+    event.preventDefault();
+    this.setState(this.baseState);
+  }
+
   render() {
     let content;
 
@@ -191,11 +199,10 @@ class Home extends React.Component {
       content = <LoadingIndicator />
     } else if (this.state.currentTitle) {
       content = (
-        <>
-          <button class="btn" onClick={this.handleBackToResults}>Back to results</button>
-          <TitleInfo title={this.state.currentTitle} />
-        </>
-
+        <TitleInfo
+          handleBackToResults={this.handleBackToResults}
+          title={this.state.currentTitle}
+        />
       )
     } else if (this.state.search) {
       content = (
@@ -213,8 +220,9 @@ class Home extends React.Component {
             <p>Yes, this incredibly useful web site does exactly what it says on the tin. A comprehensive database
         of food served in your favourite TV shows and movies.</p>
             <SearchField
-              query={this.props.searchQuery}
-              onChange={this.handleQueryChange}
+              query={this.state.searchQuery}
+              handleQueryChange={this.handleQueryChange}
+              handleClearQuery={this.handleClearQuery}
             />
           </div>
         </div>
@@ -236,12 +244,24 @@ class TitleInfo extends React.Component {
     const title = this.props.title;
     return (
       <>
-        <h3>
-          {title.display_title} ({title.year})
-        </h3>
-        {title.meals && title.meals.length > 0 &&
-          <Meals meals={title.meals} />
-        }
+        <div class="row">
+          <div class="col">
+            <button class="btn btn-info" onClick={this.props.handleBackToResults}>&laquo; Search Results</button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">{title.display_title} ({title.year})</h5>
+                <p class="card-text">{title.description}</p>
+                {title.meals && title.meals.length > 0 &&
+                  <Meals meals={title.meals} />
+                }
+              </div>
+            </div>
+          </div>
+        </div>
       </>
     )
   }
@@ -251,11 +271,11 @@ class Meals extends React.Component {
   render() {
     return (
       <>
-        <h4>Meals</h4>
+        <h6>Meals</h6>
         <ul>
           {
-            this.props.meals.map(meal => (
-              <MealInfo meal={meal} />
+            this.props.meals.map((meal, index) => (
+              <MealInfo meal={meal} key={index} />
             ))
           }
         </ul>
@@ -278,22 +298,6 @@ class MealInfo extends React.Component {
 }
 
 class SearchField extends React.Component {
-  constructor(props) {
-    super(props)
-
-    this.handleChange = this.handleChange.bind(this);
-    this.handleClear = this.handleClear.bind(this);
-  }
-
-  handleChange(event) {
-    this.props.onChange(event.target.value);
-  }
-
-  handleClear() {
-    console.log('clearing');
-    this.props.onChange('');
-  }
-
   render() {
     return (
       <form>
@@ -307,12 +311,12 @@ class SearchField extends React.Component {
               name="query"
               id="query"
               value={this.props.query}
-              onChange={this.handleChange}
+              onChange={this.props.handleQueryChange}
             ></input>
           </div>
           <div class="col-1">
-            <button class="btn" onClick={this.handleClear}>
-                Clear
+            <button class="btn" onClick={this.props.handleClearQuery}>
+              Clear
             </button>
           </div>
         </div>
@@ -335,7 +339,7 @@ class SearchResultsList extends React.Component {
     });
 
     return (
-      <ul class="list-group search-results">{results}</ul>
+      <div class="list-group">{results}</div>
     );
   }
 }
@@ -352,11 +356,9 @@ class SearchResult extends React.Component {
 
   render() {
     return (
-      <li class="list-group-item">
-        <button class="btn btn-link" onClick={this.handleButtonClick}>
-          {this.props.titleName}
-        </button>
-      </li>
+      <button class="list-group-item list-group-item-action" onClick={this.handleButtonClick}>
+        {this.props.titleName}
+      </button>
     );
   }
 }
