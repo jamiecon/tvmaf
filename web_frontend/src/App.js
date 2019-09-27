@@ -120,7 +120,6 @@ class Home extends React.Component {
   baseState = {
     page: 'home',
     currentTitleId: null,
-    search: null,
     searchQuery: "",
     loading: false,
   }
@@ -134,7 +133,6 @@ class Home extends React.Component {
     this.handleBackToResults = this.handleBackToResults.bind(this);
     this.handleQueryChange = this.handleQueryChange.bind(this);
     this.handleClearQuery = this.handleClearQuery.bind(this);
-    this.saveCurrentTitle = this.saveCurrentTitle.bind(this);
   }
 
   showTitle(titleId) {
@@ -152,42 +150,20 @@ class Home extends React.Component {
     });
   }
 
-  saveCurrentTitle() {
-    console.log('save current title to db');
-  }
-
   handleBackToResults(event) {
     this.setState({
-      currentTitle: null,
+      currentTitleId: null,
     })
   }
 
   handleQueryChange(event) {
     event.preventDefault();
     const query = event.target.value
+
     this.setState({
       searchQuery: query,
-      loading: true,
       currentTitleId: null,
     });
-
-    if (query) {
-      fetch('/search?q=' + query)
-        .then((response) => {
-          return response.json();
-        })
-        .then((json) => {
-          this.setState({
-            search: json,
-            loading: false,
-          });
-        })
-    } else {
-      this.setState({
-        search: null,
-        loading: false,
-      })
-    }
   }
 
   handleClearQuery(event) {
@@ -207,10 +183,10 @@ class Home extends React.Component {
           titleId={this.state.currentTitleId}
         />
       )
-    } else if (this.state.search) {
+    } else if (this.state.searchQuery) {
       content = (
-        <SearchResultsList
-          results={this.state.search.results.hits}
+        <SearchResults
+          query={this.state.searchQuery}
           showTitle={this.showTitle}
         />
       )
@@ -277,12 +253,11 @@ class TitleInfo extends React.Component {
     this.setState({
       editing: false
     })
-    this.props.saveCurrentTitle();
   }
 
   render() {
     let card;
-    if(this.state.loading) {
+    if (this.state.loading) {
       card = <LoadingIndicator />
     }
     else if (this.state.editing) {
@@ -410,22 +385,60 @@ class SearchField extends React.Component {
   }
 }
 
-class SearchResultsList extends React.Component {
-  render() {
-    const results = this.props.results.map((result) => {
-      return (
-        <SearchResult
-          key={result.objectID}
-          titleId={result.objectID}
-          titleName={result.displayTitle}
-          showTitle={this.props.showTitle}
-        />
-      );
-    });
+class SearchResults extends React.Component {
+  constructor(props) {
+    super(props);
 
-    return (
-      <div class="list-group">{results}</div>
-    );
+    this.state = {
+      loading: true,
+      results: null,
+    }
+  }
+
+  fetchResults(query) {
+    fetch('/search?q=' + query)
+      .then((response) => {
+        return response.json();
+      })
+      .then((json) => {
+        this.setState({
+          results: json.results.hits,
+          loading: false,
+        });
+      })
+  }
+
+  componentDidMount() {
+    this.fetchResults(this.props.query);
+  }
+
+  componentDidUpdate(prevProps) {
+    if(this.props.query !== prevProps.query) {
+      this.fetchResults(this.props.query);
+    }
+  }
+
+  render() {
+    let content;
+    if (this.state.loading) {
+      content = <LoadingIndicator />
+    } else if (this.state.results) {
+      const results = this.state.results.map((result) => {
+        return (
+          <SearchResult
+            key={result.objectID}
+            titleId={result.objectID}
+            titleName={result.displayTitle}
+            showTitle={this.props.showTitle}
+          />
+        );
+      });
+
+      content = (
+        <div class="list-group">{results}</div>
+        )
+    }
+    return content;
   }
 }
 
