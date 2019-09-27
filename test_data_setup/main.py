@@ -11,6 +11,7 @@ titles = [
         'year': '1990',
         'imdb_id': 'tt0099685',
         'netflix_id': '70002022',
+        'description': 'Goodfellas is full of delicious Italian food!',
         'meals': [
             {
                 'meal_name': 'Prison Sauce',
