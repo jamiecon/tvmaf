@@ -18,8 +18,21 @@ def ingest_titles(utf8_tsv):
     tsv_reader = csv.DictReader(utf8_tsv, delimiter='\t', quoting=csv.QUOTE_NONE)
     db = firestore.Client()
 
-    rowcount = 0
+    # Pull IMDb ID of all previously imported titles into a list
+    existing_titles = []
+    imdb_titles_collection = db.collection(TARGET_COLLECTION).select([TARGET_PRIMARY_KEY_FIELD]).stream()
+    for title in imdb_titles_collection:
+        existing_titles.append(title.to_dict()[TARGET_PRIMARY_KEY_FIELD])
+    print('Currently {0} titles in database'.format(len(existing_titles)))
+
+    total_tsv_rows = 0
+    valid_tsv_rows = 0
+    new_rows = 0
     for row in tsv_reader:
+        # print('Total rows: {0} Valid rows: {1} New rows: {2}'.format(total_tsv_rows, valid_tsv_rows, new_rows))
+        
+        total_tsv_rows += 1
+
         if row['titleType'] != 'movie' or row['isAdult'] == '1':
             continue
 
@@ -29,23 +42,19 @@ def ingest_titles(utf8_tsv):
                 continue
         except:
             continue
-        
-        rowcount += 1
 
-        existing_titles = []
-        imdb_titles_collection = db.collection(TARGET_COLLECTION).select([TARGET_PRIMARY_KEY_FIELD]).stream()
-        for title in imdb_titles_collection:
-            existing_titles.append(title.to_dict()[TARGET_PRIMARY_KEY_FIELD])
+        valid_tsv_rows += 1
 
-        if not row['tconst'] in existing_titles:
+        if not row[SOURCE_PRIMARY_KEY_FIELD] in existing_titles:
             new_document = dict(row)
             new_document['imported_at'] = datetime.datetime.now()
             db.collection(TARGET_COLLECTION).add(new_document)
-            print('Inserted new record with ID: {0} and data {1}'.format(row[SOURCE_PRIMARY_KEY_FIELD], new_document))
-        else:
-            print('Record with ID: {0} already exists'.format(row[SOURCE_PRIMARY_KEY_FIELD]))
+            new_rows += 1
+            # print('Inserted new record with ID: {0} and data {1}'.format(row[SOURCE_PRIMARY_KEY_FIELD], new_document))
+        # else:
+        #     print('Record with ID: {0} already exists'.format(row[SOURCE_PRIMARY_KEY_FIELD]))
 
-    print('Processed {0} rows.'.format(rowcount))
+    print('Total rows: {0} Valid rows: {1} New rows: {2}'.format(total_tsv_rows, valid_tsv_rows, new_rows))
 
 # Each record is a tuple of (file name, method for processing)
 IMDB_DATA_FILES = [
@@ -65,16 +74,16 @@ def ingest(data_dir='tmp/', delete_temp_files=True):
 
         tsv_gz_filename = data_dir + imdb_data_file[0] + TSV_GZ_EXTENSION
 
-        # url = BASE_URL + imdb_data_file[0] + TSV_GZ_EXTENSION
-        # try:
-        #     r = requests.get(url)
-        #     with open(tsv_gz_filename, mode='wb') as f:
-        #         f.write(r.content)
-        # except:
-        #     print('Error: Unable to download file')
-        #     break
+        url = BASE_URL + imdb_data_file[0] + TSV_GZ_EXTENSION
+        try:
+            r = requests.get(url)
+            with open(tsv_gz_filename, mode='wb') as f:
+                f.write(r.content)
+        except:
+            print('Error: Unable to download file')
+            break
 
-        # print('Successfully downloaded from {0}'.format(url))
+        print('Successfully downloaded from {0}'.format(url))
 
         with gzip.open(tsv_gz_filename, 'rb') as extracted_data:
             wrapper = TextIOWrapper(extracted_data, encoding='utf-8')
