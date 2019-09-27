@@ -130,13 +130,14 @@ class Home extends React.Component {
 
     this.state = this.baseState
 
-    this.titleClick = this.titleClick.bind(this);
+    this.showTitle = this.showTitle.bind(this);
     this.handleBackToResults = this.handleBackToResults.bind(this);
     this.handleQueryChange = this.handleQueryChange.bind(this);
     this.handleClearQuery = this.handleClearQuery.bind(this);
+    this.saveCurrentTitle = this.saveCurrentTitle.bind(this);
   }
 
-  titleClick(titleId) {
+  showTitle(titleId) {
     this.setState({
       loading: true
     });
@@ -146,11 +147,25 @@ class Home extends React.Component {
         return response.json();
       })
       .then((json) => {
+        console.log(json);
         this.setState({
           currentTitle: json.title,
           loading: false,
         });
       });
+  }
+
+  handleTitleDisplayTitleChange(event) {
+    event.preventDefault();
+    this.setState({
+      currentTitle: {
+        display: event.target.value
+      }
+    });
+  }
+
+  saveCurrentTitle() {
+    console.log('save current title to db');
   }
 
   handleBackToResults(event) {
@@ -198,17 +213,19 @@ class Home extends React.Component {
     if (this.state.loading) {
       content = <LoadingIndicator />
     } else if (this.state.currentTitle) {
+      console.log('current');
       content = (
         <TitleInfo
           handleBackToResults={this.handleBackToResults}
           title={this.state.currentTitle}
+          saveCurrentTitle={this.props.saveCurrentTitle}
         />
       )
     } else if (this.state.search) {
       content = (
         <SearchResultsList
           results={this.state.search.results.hits}
-          onTitleClick={this.titleClick}
+          showTitle={this.showTitle}
         />
       )
     }
@@ -240,8 +257,42 @@ class Home extends React.Component {
 }
 
 class TitleInfo extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      editing: false
+    }
+
+    this.handleEditTitle = this.handleEditTitle.bind(this);
+    this.handleSaveTitle = this.handleSaveTitle.bind(this);
+  }
+
+  handleEditTitle(event) {
+    event.preventDefault();
+    this.setState({
+      editing: true
+    })
+  }
+
+  handleSaveTitle(event) {
+    event.preventDefault();
+    this.setState({
+      editing: false
+    })
+    this.props.saveCurrentTitle();
+  }
+
   render() {
-    const title = this.props.title;
+    let card;
+    if (this.state.editing) {
+      card = <TitleCardEdit
+        title={this.props.title}
+        handleSaveTitle={this.handleSaveTitle}
+      />
+    } else {
+      card = <TitleCard title={this.props.title} />
+    }
+
     return (
       <>
         <div class="row">
@@ -251,19 +302,52 @@ class TitleInfo extends React.Component {
         </div>
         <div class="row">
           <div class="col">
-            <div class="card">
-              <div class="card-body">
-                <h5 class="card-title">{title.display_title} ({title.year})</h5>
-                <p class="card-text">{title.description}</p>
-                {title.meals && title.meals.length > 0 &&
-                  <Meals meals={title.meals} />
-                }
-              </div>
-            </div>
+            {card}
+          </div>
+          <div class="col">
+            <button class="btn btn-info" onClick={this.handleEditTitle}>Edit</button>
           </div>
         </div>
       </>
     )
+  }
+}
+
+function TitleCard(props) {
+  const title = props.title;
+  return (
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">{title.display_title} ({title.year})</h5>
+        <p class="card-text">{title.description}</p>
+        {title.meals && title.meals.length > 0 &&
+          <Meals meals={title.meals} />
+        }
+      </div>
+    </div>
+  );
+}
+
+class TitleCardEdit extends React.Component {
+  render() {
+    return (
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">
+            <input
+              type="text"
+              value={this.props.title.display_title}
+            />
+          </h5>
+          <p class="card-text">
+            <textarea
+              value={this.props.title.description}
+            />
+          </p>
+          <button class="btn btn-success" onClick={this.props.handleSaveTitle}>Save</button>
+        </div>
+      </div>
+    );
   }
 }
 
@@ -333,7 +417,7 @@ class SearchResultsList extends React.Component {
           key={result.objectID}
           titleId={result.objectID}
           titleName={result.displayTitle}
-          onTitleClick={this.props.onTitleClick}
+          showTitle={this.props.showTitle}
         />
       );
     });
@@ -347,16 +431,20 @@ class SearchResultsList extends React.Component {
 class SearchResult extends React.Component {
   constructor(props) {
     super(props);
-    this.handleButtonClick = this.handleButtonClick.bind(this);
+
+    this.handleSearchResultClick = this.handleSearchResultClick.bind(this);
   }
 
-  handleButtonClick(event) {
-    this.props.onTitleClick(this.props.titleId);
+  handleSearchResultClick(event) {
+    this.props.showTitle(this.props.titleId);
   }
 
   render() {
     return (
-      <button class="list-group-item list-group-item-action" onClick={this.handleButtonClick}>
+      <button
+        class="list-group-item list-group-item-action"
+        onClick={this.handleSearchResultClick}
+      >
         {this.props.titleName}
       </button>
     );
