@@ -42,6 +42,30 @@ def title(title_id):
     result_data['title'] = title.to_dict()
     return jsonify(result_data)
 
+@app.route('/title/<title_id>/edit', methods=['POST'])
+def title_edit(title_id):
+    request_json = request.get_json()
+    display_title = request_json.get('display_title')
+    description = request_json.get('description')
+    year = request_json.get('year')
+    if not display_title or not description or not year:
+        output = {
+            'success': False
+        }
+        return jsonify(output), 400
+
+    title_ref = db.collection('title').document(title_id)
+    title_ref.set({
+        'display_title': display_title,
+        'year': year,
+        'description': description,
+    }, merge=True)
+
+    output = {
+        'success': True
+    }
+    return jsonify(output)
+
 @app.route('/title/<title_id>/meal/add', methods=['POST'])
 def add_meal(title_id):
     title_ref = db.collection('title').document(title_id)

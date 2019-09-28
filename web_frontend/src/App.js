@@ -215,9 +215,9 @@ class TitleCard extends React.Component {
     this.state = {
       editing: false,
       loading: true,
-      title: null,
       titleDisplayTitle: null,
       titleDescription: null,
+      titleYear: null
     }
 
     this.handleEditTitle = this.handleEditTitle.bind(this);
@@ -255,7 +255,23 @@ class TitleCard extends React.Component {
       editing: false
     })
 
-    
+    const updated_data = {
+      'display_title': this.state.titleDisplayTitle,
+      'description': this.state.titleDescription,
+      'year': this.state.titleYear
+    }
+
+    fetch('/title/' + this.props.titleId + '/edit', {
+      method: 'post',
+      body: JSON.stringify(updated_data),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }).then(function (response) {
+      return response.json();
+    }).then(function (data) {
+      console.log(data);
+    });
   }
 
   handleDisplayTitleChange(event) {
