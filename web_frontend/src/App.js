@@ -186,7 +186,7 @@ class Home extends React.Component {
       content = <LoadingIndicator />
     } else if (this.state.currentTitleId) {
       content = (
-        <TitleCard
+        <Title
           handleBackToResults={this.handleShowResults}
           titleId={this.state.currentTitleId}
         />
@@ -227,7 +227,7 @@ class Home extends React.Component {
   }
 }
 
-class TitleCard extends React.Component {
+class Title extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -310,7 +310,7 @@ class TitleCard extends React.Component {
       card = <LoadingIndicator />
     }
     else if (this.state.editing) {
-      card = <div class="card">
+      card = (<div class="card">
         <div class="card-body">
           <h5 class="card-title">
             <input
@@ -332,18 +332,25 @@ class TitleCard extends React.Component {
           </p>
           <button class="btn btn-success" onClick={this.handleSaveTitle}>Save</button>
         </div>
-      </div>
+      </div>)
     } else {
-      card = <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">{this.state.titleDisplayTitle} ({this.state.titleYear})</h5>
-          <p class="card-text">{this.state.titleDescription}</p>
-          <button class="btn btn-info" onClick={this.handleEditTitle}>Edit</button>
-          <Meals
-            titleId={this.props.titleId}
-          />
+      card = (
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-12 col-lg-6">
+                <h5 class="card-title">{this.state.titleDisplayTitle} ({this.state.titleYear})</h5>
+                <p class="card-text">{this.state.titleDescription}</p>
+                <button class="btn btn-info" onClick={this.handleEditTitle}>Edit</button>
+              </div>
+              <div class="col-md-12 col-lg-6">
+                <Meals titleId={this.props.titleId} />
+              </div>
+            </div>
+          </div>
+
         </div>
-      </div>
+      )
     }
 
     return (
@@ -370,7 +377,9 @@ class Meals extends React.Component {
     collection.get().then((snapshot) => {
       let meals = []
       snapshot.forEach((doc) => {
-        meals.push(doc.data())
+        let meal = doc.data()
+        meal.id = doc.id;
+        meals.push(meal);
       })
       this.setState({
         meals: meals
@@ -379,17 +388,21 @@ class Meals extends React.Component {
   }
 
   render() {
-    if(this.state.meals) {
-      const content = this.state.meals.map((meal) => {
+    let content = null;
+    if (this.state.meals) {
+      content = this.state.meals.map((meal) => {
         return (
-          <Meal />          
+          <Meal
+            key={meal.id}
+            meal={meal}
+          />
         );
       })
     }
     return (
       <>
         <h6>Meals</h6>
-        {this.props.titleId}
+        {content}
       </>
     )
   }
