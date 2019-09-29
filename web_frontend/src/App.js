@@ -1,6 +1,24 @@
 import React from 'react';
 import './App.css';
 
+const firebase = require("firebase");
+require("firebase/firestore");
+
+firebase.initializeApp({
+  apiKey: "AIzaSyC9EaFsta0Ha72ryNchybnB840Uo2r1wug",
+  authDomain: "spry-bus-252723.firebaseapp.com",
+  databaseURL: "https://spry-bus-252723.firebaseio.com",
+  projectId: "spry-bus-252723",
+  storageBucket: "spry-bus-252723.appspot.com",
+  messagingSenderId: "275957993715",
+  appId: "1:275957993715:web:be4f704f2b4fc5617be786"
+});
+const db = firebase.firestore();
+
+const algoliasearch = require('algoliasearch');
+const algoliaClient = algoliasearch('9JZ8KBSETQ', 'ad297cac926002b5dc094ef1be2ec656');
+const algoliaIndex = algoliaClient.initIndex('dev_titles');
+
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -228,18 +246,15 @@ class TitleCard extends React.Component {
   }
 
   componentDidMount() {
-    fetch('/title/' + this.props.titleId)
-      .then((response) => {
-        return response.json();
-      })
-      .then((json) => {
-        this.setState({
-          titleDisplayTitle: json.title.display_title,
-          titleDescription: json.title.description,
-          titleYear: json.title.year,
-          loading: false,
-        });
+    db.collection('title').doc(this.props.titleId).get().then((doc) => {
+      const title = doc.data();
+      this.setState({
+        titleDisplayTitle: title.display_title,
+        titleDescription: title.description,
+        titleYear: title.year,
+        loading: false,
       });
+    });
   }
 
   handleEditTitle(event) {
@@ -252,26 +267,20 @@ class TitleCard extends React.Component {
   handleSaveTitle(event) {
     event.preventDefault();
     this.setState({
+      loading: true,
       editing: false
     })
 
-    const updated_data = {
+    var title_ref = db.collection('title').doc(this.props.titleId)
+    var set = title_ref.set({
       'display_title': this.state.titleDisplayTitle,
       'description': this.state.titleDescription,
       'year': this.state.titleYear
-    }
-
-    fetch('/title/' + this.props.titleId + '/edit', {
-      method: 'post',
-      body: JSON.stringify(updated_data),
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    }).then(function (response) {
-      return response.json();
-    }).then(function (data) {
-      console.log(data);
-    });
+    }, { merge: true }).then(() => {
+      this.setState({
+        loading: false
+      })
+    })
   }
 
   handleDisplayTitleChange(event) {
@@ -330,6 +339,9 @@ class TitleCard extends React.Component {
           <h5 class="card-title">{this.state.titleDisplayTitle} ({this.state.titleYear})</h5>
           <p class="card-text">{this.state.titleDescription}</p>
           <button class="btn btn-info" onClick={this.handleEditTitle}>Edit</button>
+          <Meals
+            titleId={this.props.titleId}
+          />
         </div>
       </div>
     }
@@ -345,23 +357,45 @@ class TitleCard extends React.Component {
 }
 
 class Meals extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      meals: null,
+    }
+  }
+
+  componentDidMount() {
+    var collection = db.collection('title').doc(this.props.titleId).collection('meal')
+    collection.get().then((snapshot) => {
+      let meals = []
+      snapshot.forEach((doc) => {
+        meals.push(doc.data())
+      })
+      this.setState({
+        meals: meals
+      })
+    })
+  }
+
   render() {
+    if(this.state.meals) {
+      const content = this.state.meals.map((meal) => {
+        return (
+          <Meal />          
+        );
+      })
+    }
     return (
       <>
         <h6>Meals</h6>
-        <ul>
-          {
-            this.props.meals.map((meal, index) => (
-              <MealInfo meal={meal} key={index} />
-            ))
-          }
-        </ul>
+        {this.props.titleId}
       </>
     )
   }
 }
 
-class MealInfo extends React.Component {
+class Meal extends React.Component {
   render() {
     const meal = this.props.meal;
 
@@ -416,16 +450,17 @@ class SearchResults extends React.Component {
   }
 
   fetchResults(query) {
-    fetch('/search?q=' + query)
-      .then((response) => {
-        return response.json();
-      })
-      .then((json) => {
+    algoliaIndex.search({
+      query: query
+    },
+      (err, { hits } = {}) => {
+        if (err) throw err;
         this.setState({
-          results: json.results.hits,
+          results: hits,
           loading: false,
         });
-      })
+      }
+    );
   }
 
   componentDidMount() {
