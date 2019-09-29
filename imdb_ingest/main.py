@@ -22,7 +22,9 @@ def ingest_titles(utf8_tsv):
     existing_titles = []
     imdb_titles_collection = db.collection(TARGET_COLLECTION).select([TARGET_PRIMARY_KEY_FIELD]).stream()
     for title in imdb_titles_collection:
-        existing_titles.append(title.to_dict()[TARGET_PRIMARY_KEY_FIELD])
+        imdb_id = title.to_dict().get(TARGET_PRIMARY_KEY_FIELD)
+        if imdb_id:
+            existing_titles.append(imdb_id)
     print('Currently {0} titles in database'.format(len(existing_titles)))
 
     total_tsv_rows = 0
