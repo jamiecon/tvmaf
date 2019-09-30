@@ -96,7 +96,7 @@ class HomePage extends React.Component {
   }
 }
 
-export class SearchField extends React.Component {
+class SearchField extends React.Component {
   render() {
     return (
       <form>
@@ -127,7 +127,7 @@ export class SearchField extends React.Component {
   }
 }
 
-export class SearchResults extends React.Component {
+class SearchResults extends React.Component {
   constructor(props) {
     super(props);
 
@@ -185,7 +185,7 @@ export class SearchResults extends React.Component {
   }
 }
 
-export class SearchResult extends React.Component {
+class SearchResult extends React.Component {
   constructor(props) {
     super(props);
 
@@ -208,7 +208,7 @@ export class SearchResult extends React.Component {
   }
 }
 
-export class Title extends React.Component {
+class Title extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -397,7 +397,7 @@ function TitleLink(props) {
   )
 }
 
-export class Meals extends React.Component {
+class Meals extends React.Component {
   constructor(props) {
     super(props);
 
@@ -489,7 +489,7 @@ export class Meals extends React.Component {
   }
 }
 
-export class Meal extends React.Component {
+class Meal extends React.Component {
   render() {
     const meal = this.props.meal;
 
@@ -510,7 +510,7 @@ export class Meal extends React.Component {
   }
 }
 
-export class AddMeal extends React.Component {
+class AddMeal extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
