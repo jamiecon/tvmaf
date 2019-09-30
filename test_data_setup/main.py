@@ -46,7 +46,7 @@ meals = [
     {
         'title_imdb_id': 'tt0099685',
         'meal_name': 'Ragu',
-        'time_seconds': 1856,
+        'time_seconds': 7200,
         'youtube_videos': [],
     },
     {
@@ -74,9 +74,8 @@ def insert_data():
     all_titles = db.collection(TITLES_COLLECTION).list_documents()
     for title in all_titles:
         batch.delete(title)
-    all_meals = db.collection(MEALS_COLLECTION).list_documents()
-    for meal in all_meals:
-        batch.delete(meal)
+        for meal in title.collection(MEALS_COLLECTION).list_documents():
+            batch.delete(meal)
     batch.commit()
 
     # Insert title data
