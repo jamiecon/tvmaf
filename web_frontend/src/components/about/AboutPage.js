@@ -1,6 +1,6 @@
 import React from 'react';
 
-export function AboutPage(props) {
+function AboutPage(props) {
     return (
         <div class="container">
             <div class="row">

@@ -1,9 +1,9 @@
 import React from 'react';
 
-import { db } from '../common/firestore';
-import { searchIndex } from '../common/algolia';
+import db from '../common/firestore';
+import searchIndex from '../common/algolia';
 
-export class HomePage extends React.Component {
+class HomePage extends React.Component {
   baseState = {
     page: 'home',
     currentTitleId: null,
@@ -594,3 +594,5 @@ function LoadingIndicator(props) {
     </div>
   )
 }
+
+export default HomePage;

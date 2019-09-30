@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 
-export function HeaderBar(props) {
+function HeaderBar(props) {
     return (
         <nav class="navbar navbar-expand-md navbar-dark static-top bg-dark">
             <a class="navbar-brand" href="/">tvmaf</a>
@@ -28,3 +28,5 @@ export function HeaderBar(props) {
         </nav>
     )
 }
+
+export default HeaderBar;

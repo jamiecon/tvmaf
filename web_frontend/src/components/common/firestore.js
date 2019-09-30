@@ -6,4 +6,6 @@ firebase.initializeApp({
   authDomain: "spry-bus-252723.firebaseapp.com",
   projectId: "spry-bus-252723"
 });
-export const db = firebase.firestore();
+const firestoreDatabase = firebase.firestore();
+
+export default firestoreDatabase;
