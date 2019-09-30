@@ -311,24 +311,36 @@ class Title extends React.Component {
     else if (this.state.editing) {
       card = (<div class="card">
         <div class="card-body">
-          <h5 class="card-title">
+          <h4>Edit <small>{this.state.titleDisplayTitle}</small></h4>
+          <div class="form-group">
+            <label for="title_display_title">Name</label>
             <input
+              id="title_display_title"
+              className="form-control"
               type="text"
               value={this.state.titleDisplayTitle}
               onChange={this.handleDisplayTitleChange}
             />
+          </div>
+          <div class="form-group">
+            <label for="title_title_year">Year</label>
             <input
-              type="text"
+              id="title_title_year"
+              className="form-control"
+              type="number"
               value={this.state.titleYear}
               onChange={this.handleYearChange}
             />
-          </h5>
-          <p class="card-text">
+          </div>
+          <div class="form-group">
+            <label for="title_title_description">Description</label>
             <textarea
+              id="title_title_description"
+              className="form-control"
               value={this.state.titleDescription}
               onChange={this.handleDescriptionChange}
             />
-          </p>
+          </div>
           <button class="btn btn-primary mr-1" onClick={this.handleSaveTitle}>Save</button>
           <button class="btn btn-secondary" onClick={this.handleCancelEdit}>Cancel</button>
         </div>
@@ -548,10 +560,12 @@ class AddMeal extends React.Component {
 
   render() {
     return (
-      <div>
+      <form>
+        <h5>Add a meal</h5>
         <div class="form-group">
           <label for="addmeal_mealname">Meal name</label>
           <input
+            className="form-control"
             id="addmeal_mealname"
             type="text"
             value={this.state.mealName}
@@ -561,6 +575,7 @@ class AddMeal extends React.Component {
         <div class="form-group">
           <label for="addmeal_time_seconds">Seconds</label>
           <input
+            className="form-control"
             id="addmeal_time_seconds"
             type="text"
             value={this.state.timeSeconds}
@@ -575,7 +590,7 @@ class AddMeal extends React.Component {
           class="btn btn-sm btn-secondary"
           onClick={this.props.handleCancelAddMeal}
         >Cancel</button>
-      </div >
+      </form>
     );
   }
 }
