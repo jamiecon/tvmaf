@@ -403,10 +403,24 @@ export class Meals extends React.Component {
 
     this.state = {
       meals: null,
+      adding: false,
     }
+
+    this.handleAddMeal = this.handleAddMeal.bind(this);
+    this.handleCancelAddMeal = this.handleCancelAddMeal.bind(this);
+    this.finishAdding = this.finishAdding.bind(this);
+    this.loadMeals = this.loadMeals.bind(this);
   }
 
   componentDidMount() {
+    this.loadMeals();
+  }
+
+  componentDidUpdate() {
+    this.loadMeals();
+  }
+
+  loadMeals() {
     var collection = db.collection('title').doc(this.props.titleId).collection('meal')
     collection.get().then((snapshot) => {
       let meals = []
@@ -421,24 +435,57 @@ export class Meals extends React.Component {
     })
   }
 
+  handleAddMeal(event) {
+    event.preventDefault();
+    this.setState({
+      adding: true,
+    });
+  }
+
+  handleCancelAddMeal(event) {
+    event.preventDefault();
+    this.setState({
+      adding: false,
+    })
+  }
+
+  finishAdding() {
+    this.setState({
+      adding: false
+    })
+  }
+
   render() {
-    let content = null;
-    if (this.state.meals) {
-      content = this.state.meals.map((meal) => {
-        return (
-          <Meal
-            key={meal.id}
-            meal={meal}
-          />
-        );
-      })
+    if (this.state.adding) {
+      return (
+        <AddMeal
+          titleId={this.props.titleId}
+          handleCancelAddMeal={this.handleCancelAddMeal}
+          finishAdding={this.finishAdding}
+        />
+      )
+    } else {
+      let content
+      if (this.state.meals && this.state.meals.length > 0) {
+        content = this.state.meals.map((meal) => {
+          return (
+            <Meal
+              key={meal.id}
+              meal={meal}
+            />
+          );
+        })
+      }
+
+      return (
+        <>
+          <div class="list-group">
+            {content}
+          </div>
+          <button onClick={this.handleAddMeal} class="btn btn-primary mt-1">Add a meal</button>
+        </>
+      )
     }
-    return (
-      <>
-        <h5>Meals Served</h5>
-        {content}
-      </>
-    )
   }
 }
 
@@ -447,10 +494,88 @@ export class Meal extends React.Component {
     const meal = this.props.meal;
 
     return (
-      <li>
-        {meal.meal_name}
-        <a href="https://www.netflix.com/title/">See on Netflix</a>
-      </li>
+      <div class="list-group-item">
+        <h5>{meal.meal_name}</h5>
+        <dl class="row">
+          <dt class="col-3">Time</dt>
+          <dd class="col-9">{meal.time_seconds} seconds</dd>
+          <dt class="col-3">Watch Scene</dt>
+          <dd class="col-9"><a href="https://www.netflix.com/title/">Netflix</a></dd>
+          <dt class="col-3">Recipes</dt>
+          <dd class="col-9"></dd>
+        </dl>
+        <button class="btn btn-sm btn-primary">Edit</button>
+      </div>
+    );
+  }
+}
+
+export class AddMeal extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      mealName: null,
+      timeSeconds: null,
+    }
+
+    this.handleMealNameChange = this.handleMealNameChange.bind(this);
+    this.handleSecondsChange = this.handleSecondsChange.bind(this);
+    this.handleSave = this.handleSave.bind(this);
+  }
+
+  handleMealNameChange(event) {
+    event.preventDefault();
+    this.setState({
+      mealName: event.target.value
+    })
+  }
+
+  handleSecondsChange(event) {
+    event.preventDefault();
+    this.setState({
+      timeSeconds: event.target.value
+    })
+  }
+
+  handleSave(event) {
+    event.preventDefault();
+    const meals_collection = db.collection('title').doc(this.props.titleId).collection('meal');
+    meals_collection.add({
+      'meal_name': this.state.mealName,
+      'time_seconds': this.state.timeSeconds
+    }).then(() => this.props.finishAdding());
+  }
+
+  render() {
+    return (
+      <div>
+        <div class="form-group">
+          <label for="addmeal_mealname">Meal name</label>
+          <input
+            id="addmeal_mealname"
+            type="text"
+            value={this.state.mealName}
+            onChange={this.handleMealNameChange}
+          />
+        </div>
+        <div class="form-group">
+          <label for="addmeal_time_seconds">Seconds</label>
+          <input
+            id="addmeal_time_seconds"
+            type="text"
+            value={this.state.timeSeconds}
+            onChange={this.handleSecondsChange}
+          />
+        </div>
+        <button
+          class="btn btn-sm btn-primary mr-1"
+          onClick={this.handleSave}
+        >Save</button>
+        <button
+          class="btn btn-sm btn-secondary"
+          onClick={this.props.handleCancelAddMeal}
+        >Cancel</button>
+      </div >
     );
   }
 }
