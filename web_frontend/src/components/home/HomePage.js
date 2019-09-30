@@ -360,7 +360,10 @@ class Title extends React.Component {
                 <button class="btn btn-info" onClick={this.handleEditTitle}>Edit</button>
               </div>
               <div class="col-md-12 col-lg-6">
-                <Meals titleId={this.props.titleId} />
+                <Meals
+                  titleId={this.props.titleId}
+                  netflixId={this.state.netflixId}
+                />
               </div>
             </div>
           </div>
@@ -484,6 +487,7 @@ class Meals extends React.Component {
             <Meal
               key={meal.id}
               meal={meal}
+              netflixId={this.props.netflixId}
             />
           );
         })
@@ -501,25 +505,25 @@ class Meals extends React.Component {
   }
 }
 
-class Meal extends React.Component {
-  render() {
-    const meal = this.props.meal;
-
-    return (
-      <div class="list-group-item">
-        <h5>{meal.meal_name}</h5>
-        <dl class="row">
-          <dt class="col-3">Time</dt>
-          <dd class="col-9">{meal.time_seconds} seconds</dd>
-          <dt class="col-3">Watch Scene</dt>
-          <dd class="col-9"><a href="https://www.netflix.com/title/">Netflix</a></dd>
-          <dt class="col-3">Recipes</dt>
-          <dd class="col-9"></dd>
-        </dl>
-        <button class="btn btn-sm btn-primary">Edit</button>
-      </div>
-    );
-  }
+function Meal(props) {
+  return (
+    <div class="list-group-item">
+      <h5>{props.meal.meal_name}</h5>
+      <dl class="row">
+        <dt class="col-3">Time</dt>
+        <dd class="col-9">{props.meal.time_seconds} seconds</dd>
+        <dt class="col-3">Watch Scene</dt>
+        <dd class="col-9">
+          <a href={'https://www.netflix.com/watch/' + props.netflixId + '?t=' + props.meal.time_seconds}>
+            Netflix
+          </a>
+        </dd>
+        <dt class="col-3">Recipes</dt>
+        <dd class="col-9"></dd>
+      </dl>
+      <button class="btn btn-sm btn-primary">Edit</button>
+    </div>
+  );
 }
 
 class AddMeal extends React.Component {
