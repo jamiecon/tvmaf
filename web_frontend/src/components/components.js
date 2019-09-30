@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { db } from './firestore';
-import { searchIndex } from './algolia';
+import { db } from './common/firestore';
+import { searchIndex } from './common/algolia';
 
 export class Home extends React.Component {
   baseState = {
