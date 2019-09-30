@@ -13,10 +13,10 @@ export function HeaderBar(props) {
             <div class="collapse navbar-collapse" id="navbarsExampleDefault">
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item">
-                        <NavLink className="nav-link" to="/">Home</NavLink>
+                        <NavLink className="nav-link" to="/" exact activeClassName="active">Home</NavLink>
                     </li>
                     <li class="nav-item">
-                        <NavLink className="nav-link" to="/about">About</NavLink>
+                        <NavLink className="nav-link" to="/about" activeClassName="active">About</NavLink>
                     </li>
                 </ul>
                 <ul class="navbar-nav">
