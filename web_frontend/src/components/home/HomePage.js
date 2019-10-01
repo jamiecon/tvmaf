@@ -2,6 +2,7 @@ import React from 'react';
 
 import db from '../common/firestore';
 import searchIndex from '../common/algolia';
+import PrettyDuration from '../common/PrettyDuration';
 
 class HomePage extends React.Component {
   baseState = {
@@ -511,7 +512,7 @@ function Meal(props) {
       <h5>{props.meal.meal_name}</h5>
       <dl class="row">
         <dt class="col-3">Time</dt>
-        <dd class="col-9">{props.meal.time_seconds} seconds</dd>
+        <dd class="col-9"><PrettyDuration seconds={props.meal.time_seconds} /></dd>
         <dt class="col-3">Watch Scene</dt>
         <dd class="col-9">
           <a href={'https://www.netflix.com/watch/' + props.netflixId + '?t=' + props.meal.time_seconds}>

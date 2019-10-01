@@ -5,6 +5,7 @@
   "dependencies": {
     "algoliasearch": "^3.35.0",
     "firebase": "^7.0.0",
+    "moment": "^2.24.0",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
     "react-router-dom": "^5.1.1",
