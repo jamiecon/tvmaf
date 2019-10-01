@@ -71,9 +71,9 @@ class HomePage extends React.Component {
     }
     return (
       <>
-        <div class="jumbotron pt-0">
-          <div class="container">
-            <h1 class="display-3">tv, movies and food!</h1>
+        <div className="jumbotron pt-0">
+          <div className="container">
+            <h1 className="display-3">tv, movies and food!</h1>
             <p>Yes, this incredibly useful web site does exactly what it says on the tin. A comprehensive database
         of food served in your favourite TV shows and movies.</p>
             <SearchField
@@ -85,9 +85,9 @@ class HomePage extends React.Component {
           </div>
         </div>
 
-        <div class="container">
-          <div class="row">
-            <div class="col">
+        <div className="container">
+          <div className="row">
+            <div className="col">
               {content}
             </div>
           </div>
@@ -101,11 +101,11 @@ class SearchField extends React.Component {
   render() {
     return (
       <form>
-        <div class="row">
-          <div class="col-sm-12 col-md-9">
+        <div className="row">
+          <div className="col-sm-12 col-md-9">
             <input
               type="text"
-              class="form-control"
+              className="form-control"
               placeholder="Search for TV shows, movies or foods"
               aria-label="Search"
               name="query"
@@ -114,11 +114,11 @@ class SearchField extends React.Component {
               onChange={this.props.handleQueryChange}
             ></input>
           </div>
-          <div class="col-sm-12 col-md-3">
-            <button class="btn btn-primary mr-1" onClick={this.props.handleShowResults}>
+          <div className="col-sm-12 col-md-3">
+            <button className="btn btn-primary mr-1" onClick={this.props.handleShowResults}>
               Results
             </button>
-            <button class="btn btn-secondary" onClick={this.props.handleClearQuery}>
+            <button className="btn btn-secondary" onClick={this.props.handleClearQuery}>
               Clear
             </button>
           </div>
@@ -179,7 +179,7 @@ class SearchResults extends React.Component {
       });
 
       content = (
-        <div class="list-group">{results}</div>
+        <div className="list-group">{results}</div>
       )
     }
     return content;
@@ -200,7 +200,7 @@ class SearchResult extends React.Component {
   render() {
     return (
       <button
-        class="list-group-item list-group-item-action"
+        className="list-group-item list-group-item-action"
         onClick={this.handleSearchResultClick}
       >
         {this.props.titleName}
@@ -310,10 +310,10 @@ class Title extends React.Component {
       card = <LoadingIndicator />
     }
     else if (this.state.editing) {
-      card = (<div class="card">
-        <div class="card-body">
+      card = (<div className="card">
+        <div className="card-body">
           <h4>Edit <small>{this.state.titleDisplayTitle}</small></h4>
-          <div class="form-group">
+          <div className="form-group">
             <label for="title_display_title">Name</label>
             <input
               id="title_display_title"
@@ -323,7 +323,7 @@ class Title extends React.Component {
               onChange={this.handleDisplayTitleChange}
             />
           </div>
-          <div class="form-group">
+          <div className="form-group">
             <label for="title_title_year">Year</label>
             <input
               id="title_title_year"
@@ -333,7 +333,7 @@ class Title extends React.Component {
               onChange={this.handleYearChange}
             />
           </div>
-          <div class="form-group">
+          <div className="form-group">
             <label for="title_title_description">Description</label>
             <textarea
               id="title_title_description"
@@ -342,25 +342,25 @@ class Title extends React.Component {
               onChange={this.handleDescriptionChange}
             />
           </div>
-          <button class="btn btn-primary mr-1" onClick={this.handleSaveTitle}>Save</button>
-          <button class="btn btn-secondary" onClick={this.handleCancelEdit}>Cancel</button>
+          <button className="btn btn-primary mr-1" onClick={this.handleSaveTitle}>Save</button>
+          <button className="btn btn-secondary" onClick={this.handleCancelEdit}>Cancel</button>
         </div>
       </div>)
     } else {
       card = (
-        <div class="card">
-          <div class="card-body">
-            <div class="row">
-              <div class="col-md-12 col-lg-6">
-                <h4 class="card-title">{this.state.titleDisplayTitle} ({this.state.titleYear})</h4>
+        <div className="card">
+          <div className="card-body">
+            <div className="row">
+              <div className="col-md-12 col-lg-6">
+                <h4 className="card-title">{this.state.titleDisplayTitle} ({this.state.titleYear})</h4>
                 <TitleLinks
                   netflixId={this.state.netflixId}
                   imdbId={this.state.imdbId}
                 />
-                <p class="card-text">{this.state.titleDescription}</p>
-                <button class="btn btn-info" onClick={this.handleEditTitle}>Edit</button>
+                <p className="card-text">{this.state.titleDescription}</p>
+                <button className="btn btn-info" onClick={this.handleEditTitle}>Edit</button>
               </div>
-              <div class="col-md-12 col-lg-6">
+              <div className="col-md-12 col-lg-6">
                 <Meals
                   titleId={this.props.titleId}
                   netflixId={this.state.netflixId}
@@ -374,8 +374,8 @@ class Title extends React.Component {
     }
 
     return (
-      <div class="row">
-        <div class="col">
+      <div className="row">
+        <div className="col">
           {card}
         </div>
       </div>
@@ -385,7 +385,7 @@ class Title extends React.Component {
 
 function TitleLinks(props) {
   if (props.imdbId || props.netflixId) {
-    return (<ul class="list-group list-group-horizontal">
+    return (<ul className="list-group list-group-horizontal">
       {props.netflixId &&
         <TitleLink
           url={'https://www.netflix.com/watch/' + props.netflixId}
@@ -404,7 +404,7 @@ function TitleLinks(props) {
 
 function TitleLink(props) {
   return (
-    <li class="list-group-item py-0">
+    <li className="list-group-item py-0">
       <a
         href={props.url}>
         {props.anchorText}
@@ -496,10 +496,10 @@ class Meals extends React.Component {
 
       return (
         <>
-          <div class="list-group">
+          <div className="list-group">
             {content}
           </div>
-          <button onClick={this.handleAddMeal} class="btn btn-primary mt-1">Add a meal</button>
+          <button onClick={this.handleAddMeal} className="btn btn-primary mt-1">Add a meal</button>
         </>
       )
     }
@@ -508,21 +508,21 @@ class Meals extends React.Component {
 
 function Meal(props) {
   return (
-    <div class="list-group-item">
+    <div className="list-group-item">
       <h5>{props.meal.meal_name}</h5>
-      <dl class="row">
-        <dt class="col-3">Time</dt>
-        <dd class="col-9"><PrettyDuration seconds={props.meal.time_seconds} /></dd>
-        <dt class="col-3">Watch Scene</dt>
-        <dd class="col-9">
+      <dl className="row">
+        <dt className="col-3">Time</dt>
+        <dd className="col-9"><PrettyDuration seconds={props.meal.time_seconds} /></dd>
+        <dt className="col-3">Watch Scene</dt>
+        <dd className="col-9">
           <a href={'https://www.netflix.com/watch/' + props.netflixId + '?t=' + props.meal.time_seconds}>
             Netflix
           </a>
         </dd>
-        <dt class="col-3">Recipes</dt>
-        <dd class="col-9"></dd>
+        <dt className="col-3">Recipes</dt>
+        <dd className="col-9"></dd>
       </dl>
-      <button class="btn btn-sm btn-primary">Edit</button>
+      <button className="btn btn-sm btn-primary">Edit</button>
     </div>
   );
 }
@@ -567,7 +567,7 @@ class AddMeal extends React.Component {
     return (
       <form>
         <h5>Add a meal</h5>
-        <div class="form-group">
+        <div className="form-group">
           <label for="addmeal_mealname">Meal name</label>
           <input
             className="form-control"
@@ -577,7 +577,7 @@ class AddMeal extends React.Component {
             onChange={this.handleMealNameChange}
           />
         </div>
-        <div class="form-group">
+        <div className="form-group">
           <label for="addmeal_time_seconds">Seconds</label>
           <input
             className="form-control"
@@ -588,11 +588,11 @@ class AddMeal extends React.Component {
           />
         </div>
         <button
-          class="btn btn-sm btn-primary mr-1"
+          className="btn btn-sm btn-primary mr-1"
           onClick={this.handleSave}
         >Save</button>
         <button
-          class="btn btn-sm btn-secondary"
+          className="btn btn-sm btn-secondary"
           onClick={this.props.handleCancelAddMeal}
         >Cancel</button>
       </form>
@@ -602,9 +602,9 @@ class AddMeal extends React.Component {
 
 function LoadingIndicator(props) {
   return (
-    <div class="row">
-      <div class="col-sm text-center">
-        <div class="lds-ellipsis">
+    <div className="row">
+      <div className="col-sm text-center">
+        <div className="lds-ellipsis">
           <div></div>
           <div></div>
           <div></div>

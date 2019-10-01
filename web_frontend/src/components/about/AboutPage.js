@@ -2,9 +2,9 @@ import React from 'react';
 
 function AboutPage(props) {
     return (
-        <div class="container">
-            <div class="row">
-                <div class="col">
+        <div className="container">
+            <div className="row">
+                <div className="col">
                     <h1>About</h1>
                     <p>Test application using the following services and technologies:</p>
                     <dl>
