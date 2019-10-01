@@ -36,8 +36,9 @@ meals = [
         'title_imdb_id': 'tt0099685',
         'meal_name': 'Prison Sauce',
         'time_seconds': 4234,
-        'youtube_videos': [
+        'recipes': [
             {
+                'type': 'youtube',
                 'title': 'Binging with Babish - Goodfellas Prison Sauce',
                 'id': 'uEjMyHccX8U'
             }
@@ -53,8 +54,9 @@ meals = [
         'title_imdb_id': 'tt2278388',
         'meal_name': 'Courtesan au Chocolat',
         'time_seconds': 720,
-        'youtube_videos': [
+        'recipes': [
             {
+                'type': 'youtube',
                 'title': 'Binging with Babish - Courtesan au Chocolat',
                 'id': 'GO5P3fLTwA0'
             }
@@ -64,7 +66,7 @@ meals = [
 
 TITLES_COLLECTION = 'title'
 MEALS_COLLECTION = 'meal'
-
+RECIPES_COLLECTION = 'recipes'
 
 def insert_data():
     db = firestore.Client()
@@ -76,6 +78,8 @@ def insert_data():
         batch.delete(title)
         for meal in title.collection(MEALS_COLLECTION).list_documents():
             batch.delete(meal)
+            for recipe in meal.collection(RECIPES_COLLECTION).list_documents():
+                batch.delete(recipe)
     batch.commit()
 
     # Insert title data
@@ -85,11 +89,17 @@ def insert_data():
 
     for meal in meals:
         title_imdb_id = meal.pop('title_imdb_id', None)
+        recipes = meal.pop('recipes', None)
         if title_imdb_id:
             matching_titles = db.collection(TITLES_COLLECTION).where('imdb_id', '==', title_imdb_id).stream()
             for title_doc in matching_titles:
                 title_ref = title_doc.reference
                 meals_collection = title_ref.collection(MEALS_COLLECTION)
-                meals_collection.add(meal)
+                result = meals_collection.add(meal)
+                if recipes:
+                    meal_ref = result[1]
+                    for recipe in recipes:
+                        meal_ref.collection(RECIPES_COLLECTION).add(recipe)
+                
 
 insert_data()
