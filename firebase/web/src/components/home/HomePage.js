@@ -6,7 +6,6 @@ import PrettyDuration from '../common/PrettyDuration';
 
 class HomePage extends React.Component {
   baseState = {
-    page: 'home',
     currentTitleId: null,
     searchQuery: "",
     loading: false,
@@ -506,25 +505,52 @@ class Meals extends React.Component {
   }
 }
 
-function Meal(props) {
-  return (
-    <div className="list-group-item">
-      <h5>{props.meal.meal_name}</h5>
-      <dl className="row">
-        <dt className="col-3">Time</dt>
-        <dd className="col-9"><PrettyDuration seconds={props.meal.time_seconds} /></dd>
-        <dt className="col-3">Watch Scene</dt>
-        <dd className="col-9">
-          <a href={'https://www.netflix.com/watch/' + props.netflixId + '?t=' + props.meal.time_seconds}>
-            Netflix
-          </a>
-        </dd>
-        <dt className="col-3">Recipes</dt>
-        <dd className="col-9"></dd>
-      </dl>
-      <button className="btn btn-sm btn-primary">Edit</button>
-    </div>
-  );
+class Meal extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      editing: false,
+    }
+
+    this.handleEditClick = this.handleEditClick.bind(this);
+  }
+
+  handleEditClick(event) {
+    event.preventDefault();
+    this.setState({
+      editing: true,
+    })
+  }
+
+  render() {
+    let content;
+
+    if (this.state.editing) {
+      content = <span>Editing</span>;
+    } else {
+      content = (
+        <>
+          <h5>{this.props.meal.meal_name}</h5>
+          <dl className="row">
+            <dt className="col-3">Time</dt>
+            <dd className="col-9"><PrettyDuration seconds={this.props.meal.time_seconds} /></dd>
+            <dt className="col-3">Watch Scene</dt>
+            <dd className="col-9">
+              <a href={'https://www.netflix.com/watch/' + this.props.netflixId + '?t=' + this.props.meal.time_seconds}>
+                Netflix
+            </a>
+            </dd>
+            <dt className="col-3">Recipes</dt>
+            <dd className="col-9"></dd>
+          </dl>
+          <button onClick={this.handleEditClick} className="btn btn-sm btn-primary">Edit</button>
+        </>
+      );
+    }
+
+    return (<div className="list-group-item">{content}</div>)
+  }
 }
 
 class AddMeal extends React.Component {

@@ -20,7 +20,7 @@ titles_to_insert = [
         'netflix_id': '70295915',
     },
     {
-        'display_title': 'Ad Astra',
+        'display_title': 'Addd Astra',
         'year': '2019',
         'imdb_id': 'tt2935510',
     },
