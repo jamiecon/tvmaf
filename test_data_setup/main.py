@@ -20,7 +20,7 @@ titles_to_insert = [
         'netflix_id': '70295915',
     },
     {
-        'display_title': 'Addd Astra',
+        'display_title': 'Ad Astra',
         'year': '2019',
         'imdb_id': 'tt2935510',
     },
@@ -100,6 +100,13 @@ def insert_data():
                     meal_ref = result[1]
                     for recipe in recipes:
                         meal_ref.collection(RECIPES_COLLECTION).add(recipe)
-                
+
+def delete_data():
+    db = firestore.Client()
+    all_titles = db.collection(TITLES_COLLECTION).list_documents()
+    for title in all_titles:
+        title.delete()
+        break                
 
 insert_data()
+# delete_data()
