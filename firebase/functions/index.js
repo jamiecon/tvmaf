@@ -30,31 +30,33 @@ exports.algolia_triggered_update = functions.firestore.document('title/{id}')
     });
 
 exports.algolia_full_update = functions.https.onRequest((req, resp) => {
-    console.log('Clearing index');
     const algoliaIndex = algolia.initIndex('dev_titles');
-    algoliaIndex.clearIndex().then((result) => {
-        console.log('Index cleared');
-        return null;
-    }).catch(error => {
-        console.log('Error clearing index: ' + error);
-    });
-    
-    console.log('Inserting data');
+
     const records = [];
-    db.collection('title').get().then((snapshot) => {
-        snapshot.forEach((doc) => {
-            const data = {
-                objectID: doc.id, // set the Algolia objectID as the Firebase .key
-                displayTitle: doc.get('display_title'),
-                displayYear: doc.get('year')
-            }
-            records.push(data);
+    console.log('Clearing index');
+    algoliaIndex.clearIndex()
+        .then(result => {
+            console.log('Getting titles');
+            return db.collection('title').get()
+        })
+        .then(result => {
+            console.log('Building index');
+            result.forEach((doc) => {
+                const data = {
+                    objectID: doc.id, // set the Algolia objectID as the Firebase .key
+                    displayTitle: doc.get('display_title'),
+                    displayYear: doc.get('year')
+                }
+                records.push(data);
+            });
+            return algoliaIndex.saveObjects(records);
+        })
+        .then(result => {
+            console.log('All done: ' + result);
+            resp.send('OK');
+            return result;
+        })
+        .catch(error => {
+            console.log('Error inserting data: ' + error);
         });
-        return algoliaIndex.saveObjects(records);
-    }).then(() => {
-        resp.send('OK');
-        return null;
-    }).catch(error => {
-        console.log('Error inserting data: ' + error);
-    });
 });
