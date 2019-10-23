@@ -10,17 +10,26 @@ BASE_URL = 'https://datasets.imdbws.com/'
 TSV_GZ_EXTENSION = '.tsv.gz'
 TSV_EXTENSION = '.tsv'
 
+
 def ingest_titles(utf8_tsv):
-    TARGET_COLLECTION = 'imdb_title'
-    TARGET_PRIMARY_KEY_FIELD = 'tconst'
+    # internal format
+    TARGET_COLLECTION = 'title'
+    TARGET_PRIMARY_KEY_FIELD = 'imdb_id'
+
+    # imdb format
+    # TARGET_COLLECTION = 'imdb_title'
+    # TARGET_PRIMARY_KEY_FIELD = 'tconst'
+
     SOURCE_PRIMARY_KEY_FIELD = 'tconst'
 
-    tsv_reader = csv.DictReader(utf8_tsv, delimiter='\t', quoting=csv.QUOTE_NONE)
+    tsv_reader = csv.DictReader(
+        utf8_tsv, delimiter='\t', quoting=csv.QUOTE_NONE)
     db = firestore.Client()
 
     # Pull IMDb ID of all previously imported titles into a list
     existing_titles = []
-    imdb_titles_collection = db.collection(TARGET_COLLECTION).select([TARGET_PRIMARY_KEY_FIELD]).stream()
+    imdb_titles_collection = db.collection(TARGET_COLLECTION).select(
+        [TARGET_PRIMARY_KEY_FIELD]).stream()
     for title in imdb_titles_collection:
         imdb_id = title.to_dict().get(TARGET_PRIMARY_KEY_FIELD)
         if imdb_id:
@@ -31,16 +40,17 @@ def ingest_titles(utf8_tsv):
     valid_tsv_rows = 0
     new_rows = 0
     for row in tsv_reader:
-        # print('Total rows: {0} Valid rows: {1} New rows: {2}'.format(total_tsv_rows, valid_tsv_rows, new_rows))
-        
         total_tsv_rows += 1
 
         if row['titleType'] != 'movie' or row['isAdult'] == '1':
             continue
 
+        if row['primaryTitle'] != row['originalTitle']:
+            continue
+
         try:
             year = int(row['startYear'])
-            if year < 1980:
+            if year < 2019:
                 continue
         except:
             continue
@@ -48,15 +58,29 @@ def ingest_titles(utf8_tsv):
         valid_tsv_rows += 1
 
         if not row[SOURCE_PRIMARY_KEY_FIELD] in existing_titles:
-            new_document = dict(row)
+
+            # Internal format
+            new_document = {
+                'display_title': row['primaryTitle'],
+                'year': row['startYear'],
+                'imdb_id': row[SOURCE_PRIMARY_KEY_FIELD],
+                'netflix_id': '',
+                'description': '',
+            }
+
+            # IMDb format
+            # new_document = dict(row)
+
             new_document['imported_at'] = datetime.datetime.now()
             db.collection(TARGET_COLLECTION).add(new_document)
             new_rows += 1
-            # print('Inserted new record with ID: {0} and data {1}'.format(row[SOURCE_PRIMARY_KEY_FIELD], new_document))
+        #     print('Inserted new record with ID: {0} and data {1}'.format(row[SOURCE_PRIMARY_KEY_FIELD], new_document))
         # else:
         #     print('Record with ID: {0} already exists'.format(row[SOURCE_PRIMARY_KEY_FIELD]))
 
-    print('Total rows: {0} Valid rows: {1} New rows: {2}'.format(total_tsv_rows, valid_tsv_rows, new_rows))
+    print('Total rows: {0} Valid rows: {1} New rows: {2}'.format(
+        total_tsv_rows, valid_tsv_rows, new_rows))
+
 
 # Each record is a tuple of (file name, method for processing)
 IMDB_DATA_FILES = [
@@ -67,7 +91,8 @@ IMDB_DATA_FILES = [
     # ('title.episode', None),
     # ('title.principals', None),
     # ('title.ratings', None)
-    ]
+]
+
 
 def ingest(data_dir='tmp/', delete_temp_files=True):
     for imdb_data_file in IMDB_DATA_FILES:
@@ -76,16 +101,16 @@ def ingest(data_dir='tmp/', delete_temp_files=True):
 
         tsv_gz_filename = data_dir + imdb_data_file[0] + TSV_GZ_EXTENSION
 
-        url = BASE_URL + imdb_data_file[0] + TSV_GZ_EXTENSION
-        try:
-            r = requests.get(url)
-            with open(tsv_gz_filename, mode='wb') as f:
-                f.write(r.content)
-        except:
-            print('Error: Unable to download file')
-            break
+        # url = BASE_URL + imdb_data_file[0] + TSV_GZ_EXTENSION
+        # try:
+        #     r = requests.get(url)
+        #     with open(tsv_gz_filename, mode='wb') as f:
+        #         f.write(r.content)
+        # except:
+        #     print('Error: Unable to download file')
+        #     break
 
-        print('Successfully downloaded from {0}'.format(url))
+        # print('Successfully downloaded from {0}'.format(url))
 
         with gzip.open(tsv_gz_filename, 'rb') as extracted_data:
             wrapper = TextIOWrapper(extracted_data, encoding='utf-8')
@@ -93,8 +118,8 @@ def ingest(data_dir='tmp/', delete_temp_files=True):
 
         print('Finished executing')
 
-
     return 'Success'
+
 
 def cloud_execute(request):
     ingest(data_dir='/tmp/')
